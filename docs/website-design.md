@@ -226,12 +226,15 @@ text page have at least one image**, 79 MB in total.
 - Alt text describes the object and refers the reader to the transliteration
   ("Stone libation table, inscribed on two faces; text transcribed below"),
   never "image of an inscription".
-- **Images are an optional layer.** *Built:* `python3 -m lineara site data`
+- **Images are an optional layer.** *Built:* `python3 -m lineara images fetch`
+  downloads them at a pinned commit and `python3 -m lineara site data`
   copies them from `data/upstream/lineara-images/` into `web/public/img/` and
   records each one — kind, dimensions and credit — in an `images` table;
   `--no-images` skips them. The switch is the presence of the files, which are
-  gitignored and never in CI, so a build without them is simply a build
-  without images and the pages stay correct. 1,042 images cover 537 of the 554
+  gitignored, and in CI the download is opt-in behind the repository variable
+  `INCLUDE_IMAGES`, so a build without them is simply a build without images
+  and the pages stay correct. Downloading is not publishing: a deploy still
+  needs `PUBLISH_ALLOWED`, and neither should be set without EFA permission. 1,042 images cover 537 of the 554
   faces that get a full page.
 
 ## Typography and the three token types

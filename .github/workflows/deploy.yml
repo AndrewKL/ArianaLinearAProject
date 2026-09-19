@@ -29,9 +29,19 @@ jobs:
           python-version: "3.12"
 
       - name: Build the corpus database
-        run: |
-          python3 -m lineara build
-          python3 -m lineara site data
+        run: python3 -m lineara build
+
+      # The inscription images are GORILA plate material, recorded upstream as
+      # © École Française d'Athènes. Downloading them is not publishing them —
+      # but anything in web/dist ships with a deploy, so this step is opt-in
+      # via the repository variable INCLUDE_IMAGES, and publishing still needs
+      # PUBLISH_ALLOWED as well. Do not set both without the EFA's permission.
+      - name: Download inscription images
+        if: vars.INCLUDE_IMAGES == 'true'
+        run: python3 -m lineara images fetch
+
+      - name: Build the website database
+        run: python3 -m lineara site data
 
       - name: Python tests
         run: python3 -m unittest discover -s tests

@@ -271,6 +271,12 @@ WebAssembly. See [`web/README.md`](web/README.md) to run it and
 [`docs/website-design.md`](docs/website-design.md) for the design and the
 reasoning behind the stack.
 
+Inscription images (the GORILA facsimile drawings and photographs) are not
+part of the repository. `python3 -m lineara images fetch` downloads the ~1,000
+covering the faces that get a full page into gitignored `data/upstream/`, and
+the site renders them wherever it finds them. They are © École Française
+d'Athènes: fetching them for local work is fine, publishing them is not.
+
 Nothing is deployed. Publishing the database or the inscription images needs
 the two rights questions in the design doc settled first.
 

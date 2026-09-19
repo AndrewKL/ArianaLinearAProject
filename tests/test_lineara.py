@@ -160,6 +160,20 @@ class SlugTest(unittest.TestCase):
         self.assertEqual(len(set(site.slugs_for(ids).values())), len(ids))
 
 
+class ImageNameTest(unittest.TestCase):
+    def test_candidate_names_try_drawing_then_photograph(self):
+        from lineara import images
+        self.assertEqual(images.candidate_names("IOZa2"), [
+            "IOZa2-Facsimile.jpg", "IOZa2-Facsimile.png",
+            "IOZa2-Inscription.jpg", "IOZa2-Inscription.png"])
+
+    def test_url_escapes_ids_with_punctuation(self):
+        from lineara import images
+        url = images._url("APZa<3>-Facsimile.jpg")
+        self.assertIn("APZa%3C3%3E-Facsimile.jpg", url)
+        self.assertIn(images.COMMIT, url)
+
+
 @unittest.skipUnless(builder.DB_PATH.exists(), "run `python3 -m lineara build` first")
 class CorpusTest(unittest.TestCase):
     """Checks against the built database."""

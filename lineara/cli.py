@@ -159,6 +159,11 @@ def cmd_fetch(args):
     print(upstream.fetch(force=args.force))
 
 
+def cmd_images(args):
+    from . import images
+    images.fetch(args.db, force=args.force, workers=args.workers)
+
+
 def cmd_site(args):
     from . import site
     site.export(args.db, images=not args.no_images)
@@ -368,6 +373,13 @@ def main(argv=None):
 
     s = sub.add_parser("build", help="fetch if needed, then (re)build lineara.db")
     s.set_defaults(fn=cmd_build)
+
+    s = sub.add_parser("images", help="download the inscription images (local use; see RIGHTS)")
+    img_sub = s.add_subparsers(dest="images_cmd", required=True)
+    f = img_sub.add_parser("fetch", help="download into data/upstream/lineara-images/")
+    f.add_argument("--force", action="store_true", help="re-download files already present")
+    f.add_argument("--workers", type=int, default=8)
+    f.set_defaults(fn=cmd_images)
 
     s = sub.add_parser("site", help="build web.db for the website")
     site_sub = s.add_subparsers(dest="site_cmd", required=True)

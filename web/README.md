@@ -8,7 +8,8 @@ rationale: [`../docs/website-design.md`](../docs/website-design.md).
 ```sh
 # from the repository root, once: fetch the corpus and build the databases
 python3 -m lineara build
-python3 -m lineara site data      # -> web/public/data/web.db (+ .gz)
+python3 -m lineara images fetch   # optional: inscription images, see RIGHTS below
+python3 -m lineara site data      # -> web/public/data/web.db (+ .gz), copies images
 
 cd web
 npm install
@@ -67,6 +68,20 @@ public/
   fonts/          Noto Sans Linear A, SIL OFL 1.1 — see FONTS.md
   data/           generated, not committed
 ```
+
+## Images and rights
+
+`python3 -m lineara images fetch` downloads the facsimile drawings and
+photographs from lineara.xyz at a pinned commit, for the 554 faces that get a
+full page. They land in gitignored `data/upstream/lineara-images/`, and
+`site data` copies them into `public/img/` and records each one's kind,
+dimensions and credit.
+
+They are GORILA plate material, © École Française d'Athènes. Downloading them
+for local work is fine. **Publishing them is redistribution and needs the
+EFA's permission**, which is why CI downloads them only when the repository
+variable `INCLUDE_IMAGES` is set, and deploys only when `PUBLISH_ALLOWED` is
+set as well. `site data --no-images` builds without them.
 
 ## Not yet built
 
