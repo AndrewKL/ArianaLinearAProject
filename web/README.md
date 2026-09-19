@@ -86,4 +86,4 @@ set as well. `site data --no-images` builds without them.
 ## Not yet built
 
 The ledger layout for accounting tablets, word-level alignment highlighting,
-search, word and sign pages, and the images panel. See the design doc's phases.
+search, and word and sign pages. See the design doc's phases.
