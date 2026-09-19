@@ -1,0 +1,88 @@
+name: Build and deploy the site
+
+# NOTE: deployment is gated on purpose. The published database embeds text
+# from lineara.xyz, which carries no licence, so `deploy` only runs when the
+# repository variable PUBLISH_ALLOWED is set to 'true'. Build and checks run
+# on every push. See docs/website-design.md, "Rights: this constrains the design".
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the corpus database
+        run: |
+          python3 -m lineara build
+          python3 -m lineara site data
+
+      - name: Python tests
+        run: python3 -m unittest discover -s tests
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install
+        working-directory: web
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: web
+        run: npm run typecheck
+
+      # BASE must match the Pages path: /<repo>/ for a project site, / for a
+      # user site or a custom domain.
+      - name: Build the site
+        working-directory: web
+        env:
+          BASE: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Smoke test in a real browser
+        working-directory: web
+        env:
+          BASE: /${{ github.event.repository.name }}/
+          CHROME: /usr/bin/google-chrome
+        run: |
+          npx --yes http-server dist -p 4173 --silent &
+          sleep 2
+          node scripts/smoke.mjs "http://localhost:4173/${{ github.event.repository.name }}/?selftest" || \
+            node scripts/smoke.mjs "http://localhost:4173/?selftest"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && vars.PUBLISH_ALLOWED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

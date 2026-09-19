@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from lineara import build as builder
+from lineara import site
 from lineara.signs import SignTable, contains, sign_edit_distance
 
 # A few real entries from signs.json, enough to exercise the tokenizer offline.
@@ -113,6 +114,33 @@ class ReadingsValidationTest(unittest.TestCase):
     def test_rejects_unresolvable_form(self):
         with self.assertRaises(builder.ReadingsError):
             self.load([{"form": "ku-vin", "gloss": "x", "kind": "k", "confidence": "debated"}])
+
+
+class SlugTest(unittest.TestCase):
+    def test_plain_ids(self):
+        self.assertEqual(site.slugify("IO Za 2"), "io-za-2")
+        self.assertEqual(site.slugify("HT 123+124a"), "ht-123-124a")
+        self.assertEqual(site.slugify("AP Za <3>"), "ap-za-3")
+        self.assertEqual(site.slugify("HT Wa 1019\u03b1"), "ht-wa-1019a")
+
+    def test_collisions_both_get_a_suffix(self):
+        m = site.slugs_for(["HT 154", "HT 154.", "IO Za 2"])
+        self.assertEqual(m["IO Za 2"], "io-za-2")
+        self.assertNotEqual(m["HT 154"], m["HT 154."])
+        self.assertTrue(m["HT 154"].startswith("ht-154-"))
+        self.assertTrue(m["HT 154."].startswith("ht-154-"))
+
+    def test_slugs_do_not_depend_on_order_or_neighbours(self):
+        a = site.slugs_for(["HT 154", "HT 154.", "IO Za 2"])
+        b = site.slugs_for(["IO Za 2", "HT 154.", "HT 154"])
+        self.assertEqual(a, b)
+        # Adding an unrelated id must not move an existing slug.
+        c = site.slugs_for(["HT 154", "HT 154.", "IO Za 2", "ZA 15"])
+        self.assertEqual(a["HT 154"], c["HT 154"])
+
+    def test_slugs_are_unique_across_the_corpus(self):
+        ids = ["HT 154", "HT 154.", "HT 154a", "HT 154a.", "IO Za 2"]
+        self.assertEqual(len(set(site.slugs_for(ids).values())), len(ids))
 
 
 @unittest.skipUnless(builder.DB_PATH.exists(), "run `python3 -m lineara build` first")

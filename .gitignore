@@ -6,3 +6,9 @@ lineara.db.tmp
 __pycache__/
 *.pyc
 .DS_Store
+
+# Website build
+web/node_modules/
+web/dist/
+web/dist-ssr/
+web/public/data/

@@ -159,6 +159,11 @@ def cmd_fetch(args):
     print(upstream.fetch(force=args.force))
 
 
+def cmd_site(args):
+    from . import site
+    site.export(args.db)
+
+
 def cmd_build(args):
     try:
         builder.build(args.db)
@@ -363,6 +368,11 @@ def main(argv=None):
 
     s = sub.add_parser("build", help="fetch if needed, then (re)build lineara.db")
     s.set_defaults(fn=cmd_build)
+
+    s = sub.add_parser("site", help="build web.db for the website")
+    site_sub = s.add_subparsers(dest="site_cmd", required=True)
+    d = site_sub.add_parser("data", help="export web/public/data/web.db (+ .gz)")
+    d.set_defaults(fn=cmd_site)
 
     s = sub.add_parser("show", help="one inscription: text, words, readings")
     s.add_argument("id", help="e.g. 'IO Za 2', IOZa2, 'HT 13', 'HT 115'")

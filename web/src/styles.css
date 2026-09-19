@@ -1,0 +1,287 @@
+/* Linear A is outside the BMP: without these fonts the text renders as tofu.
+   Noto fonts are SIL OFL 1.1; see public/fonts/FONTS.md. */
+@font-face {
+  font-family: "Linear A";
+  /* Relative to the built stylesheet, so it resolves under any Pages base path. */
+  src: url("../fonts/NotoSansLinearA-Regular.ttf") format("truetype");
+  /* One font covers both blocks: 342 Linear A characters and 57 Aegean numerals. */
+  unicode-range: U+10100-1013F, U+10600-1077F;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+  --ink: #1a1815;
+  --paper: #faf7f2;
+  --muted: #6b6155;
+  --rule: #ddd5c8;
+  --accent: #7a3b2e;
+  --established: #2f5d3f;
+  --speculative: #8a6d2f;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eee7dc;
+    --paper: #17150f;
+    --muted: #a99d8c;
+    --rule: #3a342a;
+    --accent: #d9917f;
+    --established: #7fbc95;
+    --speculative: #d3b169;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 ui-serif, Georgia, "Times New Roman", serif;
+}
+main,
+.masthead,
+footer {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+.masthead a {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ink);
+}
+.masthead-note,
+.meta,
+.layer-note,
+.provenance,
+.status {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+a {
+  color: var(--accent);
+}
+h1 {
+  font-size: 1.9rem;
+  margin-bottom: 0.25rem;
+}
+h2 {
+  font-size: 1.15rem;
+  margin-top: 2.5rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.3rem;
+}
+.lede {
+  max-width: 44rem;
+}
+
+/* --- the text block: glyph above its value, aligned per sign --- */
+.text-block {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--paper) 85%, var(--ink) 4%);
+  overflow-x: auto;
+}
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.15rem 0.1rem;
+  margin: 0 0 1rem;
+}
+.line:last-child {
+  margin-bottom: 0;
+}
+.cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 1.6rem;
+  padding: 0.15rem 0.2rem;
+  border-radius: 3px;
+}
+.cell:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.glyph {
+  font-family: "Linear A", "Noto Sans Linear A", serif;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+.glyph.num {
+  font-family: ui-monospace, monospace;
+  font-size: 1.35rem;
+}
+.translit {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.translit.novalue {
+  font-style: italic; /* *301 and friends: a sign number, not a sound */
+}
+.translit.logo {
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+}
+.cell.divider .glyph,
+.cell.mark .glyph {
+  font-family: ui-serif, serif;
+  font-size: 1.35rem;
+  color: var(--muted);
+}
+.cell.mark {
+  color: var(--muted);
+}
+
+/* --- words and readings --- */
+.words {
+  list-style: none;
+  padding: 0;
+}
+.word {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.word-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.form {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1rem;
+}
+.attest,
+.no-reading {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.readings {
+  list-style: none;
+  padding: 0.4rem 0 0;
+  margin: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+.reading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.9rem;
+}
+.bars {
+  font-family: ui-monospace, monospace;
+  letter-spacing: -0.05em;
+}
+.confidence {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  min-width: 9ch;
+}
+.reading.established .bars,
+.reading.established .confidence {
+  color: var(--established);
+}
+.reading.speculative .bars,
+.reading.speculative .confidence {
+  color: var(--speculative);
+}
+.attribution {
+  color: var(--muted);
+}
+
+/* --- home --- */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-block: 1px solid var(--rule);
+}
+.stats dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stats dd {
+  margin: 0.1rem 0 0;
+  font-size: 1.3rem;
+}
+.featured {
+  list-style: none;
+  padding: 0;
+}
+.featured li {
+  display: grid;
+  grid-template-columns: 7rem 8rem 1fr;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.featured .site,
+.snippet {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.snippet {
+  font-family: ui-monospace, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+button {
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.sites {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+footer {
+  margin-top: 3rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 40rem) {
+  .featured li {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+  .glyph {
+    font-size: 1.7rem;
+  }
+}

@@ -254,14 +254,25 @@ non-commercial and share-alike. See the upstream
 The Schümann preprint is CC BY 4.0. The glosses here are short quotations,
 with attribution.
 
-## A website for this data
+## The website
 
-`docs/website-design.md` is a design doc for a browsable website built on
-`lineara.db`: every text with its Linear A, its transliteration, and the
-competing proposed meanings per word. It covers page anatomy, the two
-document genres, typography and font handling, the JSON data shape, URLs,
-search, accessibility and the licensing constraints. The build target is
-left open.
+`web/` is a React site over this database, prerendered to static HTML: every
+text with its Linear A, its transliteration sign by sign, and the competing
+proposed meanings per word.
+
+```sh
+python3 -m lineara site data     # web/public/data/web.db (1.1 MB, 322 KB gzipped)
+cd web && npm install && npm run dev
+```
+
+299 text pages are prerendered from the database with `node:sqlite`; the same
+queries run in the browser against the same file through SQLite compiled to
+WebAssembly. See [`web/README.md`](web/README.md) to run it and
+[`docs/website-design.md`](docs/website-design.md) for the design and the
+reasoning behind the stack.
+
+Nothing is deployed. Publishing the database or the inscription images needs
+the two rights questions in the design doc settled first.
 
 ## Limitations
 

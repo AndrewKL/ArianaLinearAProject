@@ -259,13 +259,10 @@ without a font that covers it.
 
 - Self-host **Noto Sans Linear A** as WOFF2, subset to U+10600–U+1077F, with
   `font-display: swap` and a `unicode-range` descriptor.
-- Aegean numerals and word dividers (U+10100–U+1013F) are a **separate block**
-  and need a second font. lineara.xyz ships exactly two font files for this,
-  `NotoSansLinearA-LinearB.ttf` and `NotoSansSymbols2-Regular.ttf`, which is
-  good evidence that Noto Sans Symbols 2 is the one that covers the Aegean
-  block. Confirm by subsetting before committing to it; if the numeral glyphs
-  turn out to be unavailable, render numerals as digits, which is what the
-  transliteration layer does anyway.
+- **One font is enough** (measured, not assumed): Noto Sans Linear A v2.000
+  carries 342 characters in the Linear A block *and* 57 in Aegean Numbers
+  (U+10100–U+1013F). Noto Sans Symbols 2 carries neither and was dropped.
+  The file is committed at `web/public/fonts/`, SIL OFL 1.1.
 - Glyphs are intricate. Set the Linear A layer at ~2rem minimum with generous
   `letter-spacing`; do not let it inherit body size.
 - Run a **font load check**: if the font fails, show a one-line notice above
@@ -317,7 +314,7 @@ which is equally worth showing.
 | UI | React + TypeScript, built with Vite |
 | Data | `@sqlite.org/sqlite-wasm`: the corpus database fetched once and queried in the browser |
 | Pages | Every route prerendered to real HTML at build time, then hydrated |
-| Routing | React Router, with prerendered entry files and a `404.html` fallback |
+| Routing | Plain links between prerendered pages, plus a `404.html` fallback. React Router only when a view needs client-side navigation |
 | Styling | Hand-written CSS modules |
 | Deploy | GitHub Actions → `upload-pages-artifact` + `deploy-pages` |
 | Data build | The existing Python pipeline, which emits `web.db` |
@@ -328,9 +325,14 @@ which is equally worth showing.
   the confidence ordering are SQL in the CLI today, and they transfer to the
   site unchanged. One query language across the terminal and the web, one
   place where "where else does this word occur" is defined.
-- **It is smaller than the JSON it replaces.** Measured: the database with
-  the `raw` column dropped is **380 KB gzipped**. Per-text JSON files plus a
-  separate search index would total more and duplicate the same rows.
+- **It is smaller than the JSON it replaces.** Measured after building it:
+  the database with the `raw` column dropped is 1.1 MB, **322 KB gzipped**.
+  Per-text JSON files plus a separate search index would total more and
+  duplicate the same rows.
+- **The runtime costs more than the data.** sqlite-wasm is 869 KB (404 KB
+  gzipped), larger than the corpus itself. It is therefore imported
+  dynamically, so it is fetched only when a visitor asks for something the
+  prerendered page cannot answer.
 - **Search becomes a query, not an index.** Matching is on sign-id keys
   (`instr(' ' || key || ' ', ' ' || ? || ' ')`), which works verbatim in the
   browser. A JavaScript search library would tokenize `*301` and astral
@@ -347,8 +349,9 @@ and pays for itself three more times: crawlers and link previews see content,
 readers without JavaScript still get the text, and first paint does not wait
 on a WebAssembly runtime plus a database download.
 
-The prerender step runs in Node against the *same* `web.db` (via
-`better-sqlite3`), so there is exactly one data source. SQLite-wasm then loads
+The prerender step runs in Node against the *same* `web.db`, through
+`node:sqlite`, which is built into Node 22 — so there is exactly one data
+source and no native module to install. SQLite-wasm then loads
 lazily in the browser, only for the views that need the whole corpus: search,
 word pages, filtered indexes.
 
@@ -367,9 +370,16 @@ the simpler answer.
 - **No custom headers on Pages**, so no COOP/COEP, so no `SharedArrayBuffer`.
   Use the single-threaded, in-memory sqlite-wasm build. No OPFS persistence;
   cache the database bytes in Cache Storage instead.
-- **Pages does not compress `application/octet-stream`.** Shipping `web.db`
-  raw means 2.4 MB on the wire instead of 380 KB. Ship `web.db.gz` and inflate
-  it with `DecompressionStream('gzip')`, and keep the raw file as a fallback.
+- **Ship `web.db.gz`, and sniff it rather than trusting headers.** Pages does
+  not compress `application/octet-stream`, so the raw file would cross the
+  wire at 1.1 MB instead of 322 KB. But whether the *client* still sees gzip
+  depends on the server: some send `.gz` with `Content-Encoding: gzip`, and
+  the browser has already inflated it — piping that through
+  `DecompressionStream` fails, and it surfaces unhelpfully as
+  "TypeError: Failed to fetch". (Vite's own preview server does exactly this,
+  which is how we found it.) Check the gzip magic bytes `1f 8b` and inflate
+  only when they are there, then verify the SQLite header before handing the
+  bytes to sqlite-wasm.
 - **Two toolchains**: Python for the data, Node for the site. The boundary is
   `web.db`, and it is the only thing they share.
 - Pages soft limits: 1 GB per site, ~100 GB/month bandwidth. The database is
@@ -512,6 +522,12 @@ the dataset citation, not just the URL.
    layers, alignment, both genres, fonts, per-word attestation — with the
    Vite build, the `web.db` step and the Actions deploy wired up end to end.
    This carries the whole design risk and most of the stack risk.
+   *Standing now:* the stack end to end, `web.db` (322 KB gzipped), 299
+   prerendered routes, sign-level stacked transliteration, per-word readings
+   with confidence, the font, the build-time guards and a headless-browser
+   smoke test. *Still to do in this phase:* the ledger layout for accounting
+   tablets, word-level alignment highlighting (sign grouping per word), and
+   the images panel.
 2. **SQLite in the browser: word pages and search.** `/words/ku-ro` and the
    query layer. This is where the site becomes more useful than a PDF, and
    where React earns its keep.
@@ -545,12 +561,12 @@ the dataset citation, not just the URL.
 
 ### To verify before building
 
-- That Noto Sans Symbols 2 covers U+10100–U+1013F (Aegean numbers), as
-  lineara.xyz's bundled fonts suggest.
+- ~~Font coverage of the Aegean block~~ — settled: one font covers both.
+- ~~That single-threaded sqlite-wasm runs without COOP/COEP~~ — settled: it
+  boots and answers a query in under 100 ms in headless Chrome.
 - The `lab` language subtag and `Lina` script subtag.
-- That the damage mark and the four unassigned code points are handled
-  everywhere text is emitted: the page, copy-to-clipboard, `aria-label`s, the
-  prerendered HTML and every search result.
-- That single-threaded sqlite-wasm runs on Pages without COOP/COEP headers,
-  and that `DecompressionStream('gzip')` is available in the browsers you
-  intend to support.
+- That the damage mark and the four unassigned code points stay out of
+  everything the page emits. `web/scripts/check-dist.mjs` enforces this over
+  the built HTML; extend it as copy-to-clipboard and search are added.
+- Behaviour on a real Pages deployment under a `/<repo>/` base path, which the
+  local preview only approximates.
