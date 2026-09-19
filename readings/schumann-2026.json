@@ -1,0 +1,95 @@
+{
+  "source": {
+    "id": "schumann-2026",
+    "author": "Michael Schümann",
+    "year": 2026,
+    "date": "2026-06-15",
+    "title": "The Linear A Inscription IO Za 2 - A Ritual Invocation from the Sanctuary of Tinu and Ida-Mate",
+    "url": "https://doi.org/10.5281/zenodo.20698076",
+    "kind": "preprint",
+    "peer_reviewed": false,
+    "reported_by": "Leman Altuntaş, Arkeonews: https://arkeonews.net/3500-year-old-linear-a-prayer-may-reveal-minoan-roots-of-dionysos-and-demeter/",
+    "notes": "Zenodo preprint v1.0, CC BY 4.0, no peer review indicated. The glosses rest on the author's own reconstruction of the Minoan language, with no independent test against other inscriptions. Full proposed translation of IO Za 2: \"Father of the Bull-Contest of Dikte, weep the tears; may the libation offering flow in streams in the sanctuary of the god Tinu and Ida-Mate.\" Glosses below are as reported by Arkeonews; check them against the preprint before citing."
+  },
+  "readings": [
+    {
+      "form": "a-ta-i-*301-wa-ja",
+      "source_form": "A-TA-I-JO-WA-JA",
+      "gloss": "Father of the Bull-Contest",
+      "kind": "epithet",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "Reads sign *301 as JO. *301 has no agreed sound value."
+    },
+    {
+      "form": "ja-di-ki-tu",
+      "gloss": "from Dikte",
+      "kind": "toponym",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "The Dikte identification itself is older and widely discussed; the ablative sense 'from' is this source's."
+    },
+    {
+      "form": "ja-sa-sa-ra-me",
+      "source_form": "JA-SA-SA-RA-ŽA",
+      "gloss": "the tears",
+      "kind": "lexical",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "Reads the fifth sign (AB13, conventionally ME) as ŽA, a value from the author's own phonetic reconstruction. The same sequence recurs on libation vessels from several sanctuaries; 'tears' has to make sense in each of them."
+    },
+    {
+      "form": "u-na-ka-na-si",
+      "gloss": "weep",
+      "kind": "lexical",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2"
+    },
+    {
+      "form": "i-pi-na-ma",
+      "gloss": "the libation offering",
+      "kind": "lexical",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2"
+    },
+    {
+      "form": "si-ru-te",
+      "gloss": "may it flow in streams",
+      "kind": "lexical",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2"
+    },
+    {
+      "form": "ta-na-ra",
+      "gloss": "sanctuary",
+      "kind": "lexical",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "The source splits TA-NA-RA-TE-U-TI-NU into TA-NA-RA / TE-U / TI-NU. There is no word divider there on the stone, and the corpus segments it as one word."
+    },
+    {
+      "form": "te-u",
+      "gloss": "of the god",
+      "kind": "lexical",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "Part of TA-NA-RA-TE-U-TI-NU; see the TA-NA-RA note."
+    },
+    {
+      "form": "ti-nu",
+      "gloss": "Tinu, a divine name; proposed as an earlier form of Mycenaean di-wo-nu-so (Dionysos)",
+      "kind": "theonym",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "Depends on the TE-U / TI-NU split. The sound correspondence TI-NU ~ di-wo-nu-so is not demonstrated."
+    },
+    {
+      "form": "i-da-ma-te",
+      "gloss": "Ida-Mate, a pre-Mycenaean form connected with Demeter",
+      "kind": "theonym",
+      "confidence": "speculative",
+      "proposed_on": "IO Za 2",
+      "notes": "On IO Za 2 only I-DA[...] survives before the break, so the full form is a restoration. The complete sequence is attested on the Arkalochori axes AR Zf 1 and AR Zf 2. The Demeter comparison predates this paper by decades."
+    }
+  ]
+}

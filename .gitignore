@@ -1,0 +1,8 @@
+# Upstream corpus is fetched at build time (see README: licences)
+data/upstream/
+# Build output
+lineara.db
+lineara.db.tmp
+__pycache__/
+*.pyc
+.DS_Store

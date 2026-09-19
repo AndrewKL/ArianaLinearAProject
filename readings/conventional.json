@@ -1,0 +1,84 @@
+{
+  "source": {
+    "id": "conventional",
+    "author": "compiled for this repository",
+    "title": "Contextual interpretations common in the Linear A literature",
+    "kind": "compilation",
+    "notes": "Not a single publication. These are the interpretations that most discussions of Linear A take as a starting point, each with the internal evidence for it in `basis`, which can be checked against this database (python3 -m lineara word <form>). Before citing any of them, go to the literature: e.g. J. G. Younger, Linear A Lexicon (online), and B. Davis (2014), Minoan Stone Vessels with Linear A Inscriptions (Aegaeum 36), for the libation formula."
+  },
+  "readings": [
+    {
+      "form": "ku-ro",
+      "gloss": "total",
+      "kind": "accounting",
+      "confidence": "widely-accepted",
+      "basis": "Stands at the end of lists before a figure that sums the entries above it. On HT 13 the integer entries 5 + 56 + 27 + 18 + 19 + 5 give KU-RO 130. The meaning comes from position and arithmetic, not from the sound value."
+    },
+    {
+      "form": "po-to-ku-ro",
+      "gloss": "grand total",
+      "kind": "accounting",
+      "confidence": "widely-accepted",
+      "basis": "HT 122b ends KU-RO 65, PO-TO-KU-RO 97; face a has KU-RO 31. As the text stands 31 + 65 = 96, one short of 97. Also on HT 131b (452). Read as KU-RO with a prefix, 'total of totals'."
+    },
+    {
+      "form": "ki-ro",
+      "gloss": "deficit, amount owed (?)",
+      "kind": "accounting",
+      "confidence": "debated",
+      "basis": "Accounting term: 14 of its 15 attestations are Haghia Triada tablets, often in the same list as KU-RO (HT 123+124). The sense 'owed' is inferred from position only."
+    },
+    {
+      "form": "a-ta-i-*301-wa-ja",
+      "variants": ["a-ta-i-*301-wa-e"],
+      "gloss": "opening element of the libation formula; meaning unknown",
+      "kind": "formula",
+      "confidence": "established",
+      "basis": "Stands first on stone libation vessels from several peak and cave sanctuaries (Iouktas, Syme, Palaikastro, Troullos, Kophinas). The claim is about its position, not its meaning. *301 has no agreed sound value."
+    },
+    {
+      "form": "ja-di-ki-tu",
+      "variants": ["a-di-ki-te", "a-di-ki-te-te"],
+      "gloss": "Dikte (place name)",
+      "kind": "toponym",
+      "confidence": "widely-accepted",
+      "basis": "Follows the opening element of the formula, and resembles Greek Δίκτη, the Cretan mountain. The identification rests on that resemblance plus position; the Palaikastro forms A-DI-KI-TE(-TE) come from the Dikte region."
+    },
+    {
+      "form": "ja-sa-sa-ra-me",
+      "variants": ["a-sa-sa-ra-me", "sa-sa-ra-me"],
+      "gloss": "a divine name or epithet (?)",
+      "kind": "theonym",
+      "confidence": "debated",
+      "basis": "The most widespread element of the formula: libation vessels from several sanctuaries, plus a metal object (PL Zf 1). The alternation JA- / A- / zero is a recurring pattern in the formula. That it names a deity is inferred from its recurrence in dedications."
+    },
+    {
+      "form": "u-na-ka-na-si",
+      "gloss": "libation formula element; meaning unknown",
+      "kind": "formula",
+      "confidence": "established",
+      "basis": "Recurs in the formula, usually right after JA-SA-SA-RA-ME. Variants with an extra RU (U-NA-RU-KA-NA-TI, PK Za 11) are sometimes grouped with it."
+    },
+    {
+      "form": "i-pi-na-ma",
+      "gloss": "libation formula element; meaning unknown",
+      "kind": "formula",
+      "confidence": "established",
+      "basis": "Recurs in the formula, typically before SI-RU-TE."
+    },
+    {
+      "form": "si-ru-te",
+      "gloss": "libation formula element; meaning unknown",
+      "kind": "formula",
+      "confidence": "established",
+      "basis": "Recurs in the formula, typically after I-PI-NA-MA and near the end."
+    },
+    {
+      "form": "i-da-ma-te",
+      "gloss": "compared with Mount Ida and with Demeter; unproven",
+      "kind": "theonym",
+      "confidence": "speculative",
+      "basis": "Written on two votive double axes from the Arkalochori cave (AR Zf 1, AR Zf 2). The comparisons rest on sound resemblance alone."
+    }
+  ]
+}
