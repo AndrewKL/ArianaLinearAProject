@@ -50,6 +50,26 @@ export interface TextPage {
   lines: { n: number; tokens: Token[] }[];
   words: Word[];
   wordLayer: "editorial" | "mechanical";
+  translations: Translation[];
+}
+
+export interface Translation {
+  text: string;
+  notes: string | null;
+  sourceId: string;
+  sourceLabel: string;
+  sourceTitle: string;
+  sourceUrl: string | null;
+  sourceKind: string;
+  peerReviewed: number | null;
+  year: number | null;
+}
+
+export interface Featured extends Translation {
+  slug: string;
+  inscriptionId: string;
+  site: string | null;
+  type: string | null;
 }
 
 export interface Stats {
@@ -65,6 +85,7 @@ export interface Stats {
 export interface HomeData {
   route: "home";
   stats: Stats;
+  headline: Featured | null;
   featured: { slug: string; id: string; site: string | null; translit: string }[];
 }
 

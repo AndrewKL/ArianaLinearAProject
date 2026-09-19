@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { HomeData } from "../data/types";
+import type { Featured, HomeData } from "../data/types";
 
 /**
  * Proves the second data path: the same database, queried in the browser.
@@ -61,6 +61,42 @@ function BrowserQuery() {
   );
 }
 
+/**
+ * The proposal a visitor most likely arrived for. Shown as a claim with an
+ * owner, never in the site's own voice, and leading to the word-by-word
+ * evidence rather than standing on its own.
+ */
+function Headline({ item }: { item: Featured }) {
+  return (
+    <aside className="headline">
+      <p className="kicker">
+        A proposed translation{item.year ? `, ${item.year}` : ""}
+      </p>
+      <blockquote>“{item.text}”</blockquote>
+      <p className="claim">
+        {item.sourceLabel} reads {item.inscriptionId}, a libation table from{" "}
+        {item.site ?? "an unrecorded site"}, this way.{" "}
+        {item.peerReviewed === 0 && (
+          <>
+            The paper is a <strong>{item.sourceKind}</strong> and has not been peer-reviewed.{" "}
+          </>
+        )}
+        Linear A is undeciphered, so this is one reading among others, not a settled translation.
+      </p>
+      <p className="actions">
+        <a className="go" href={`${import.meta.env.BASE_URL}texts/${item.slug}/`}>
+          See {item.inscriptionId} word by word →
+        </a>
+        {item.sourceUrl && (
+          <a href={item.sourceUrl} rel="nofollow noopener">
+            the paper
+          </a>
+        )}
+      </p>
+    </aside>
+  );
+}
+
 export function Home({ data }: { data: HomeData }) {
   const s = data.stats;
   return (
@@ -71,6 +107,8 @@ export function Home({ data }: { data: HomeData }) {
         proposed it and how strong the claim is. Linear A is undeciphered: readings here are
         proposals, never translations of record.
       </p>
+
+      {data.headline && <Headline item={data.headline} />}
 
       <dl className="stats">
         <div>

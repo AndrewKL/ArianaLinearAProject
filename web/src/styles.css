@@ -285,3 +285,52 @@ footer {
     font-size: 1.7rem;
   }
 }
+
+/* --- a whole-text proposal: a claim with an owner, never the site's voice --- */
+.headline {
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--speculative);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--paper) 85%, var(--ink) 4%);
+}
+.kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--speculative);
+}
+.headline blockquote,
+.translation blockquote {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+.headline .claim,
+.rests-on {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+}
+.actions .go {
+  font-weight: 600;
+}
+.translation {
+  margin: 0 0 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--speculative);
+}
+.translation figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}

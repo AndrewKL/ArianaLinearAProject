@@ -68,7 +68,7 @@ def _web_schema():
 
 
 TABLES = ["meta", "signs", "words", "runs", "sign_occurrences",
-          "sources", "readings", "reading_forms"]
+          "sources", "readings", "reading_forms", "translations"]
 
 
 def export(db_path=builder.DB_PATH, out=WEB_DB, log=print):

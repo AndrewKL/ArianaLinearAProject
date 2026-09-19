@@ -111,6 +111,23 @@ class ReadingsValidationTest(unittest.TestCase):
             self.load([{"form": "ku-ro", "gloss": "x", "kind": "k", "confidence": "debated",
                         "proposed_on": "HT 9999"}])
 
+    def test_translation_loads_and_is_kept_apart_from_readings(self):
+        doc = {"source": {"id": "t", "author": "A. Author", "title": "T", "kind": "preprint"},
+               "translations": [{"inscription": "HT 13", "text": "a whole-text proposal"}],
+               "readings": []}
+        Path(self.dir.name, "t.json").write_text(json.dumps(doc), encoding="utf-8")
+        builder.load_readings(self.conn, self.signs, self.dir.name, warn=lambda _m: None)
+        rows = self.conn.execute("SELECT inscription_id, text FROM translations").fetchall()
+        self.assertEqual(rows, [("HT 13", "a whole-text proposal")])
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM readings").fetchone()[0], 0)
+
+    def test_rejects_translation_for_unknown_inscription(self):
+        doc = {"source": {"id": "t", "author": "A", "title": "T", "kind": "preprint"},
+               "translations": [{"inscription": "HT 9999", "text": "x"}]}
+        Path(self.dir.name, "t.json").write_text(json.dumps(doc), encoding="utf-8")
+        with self.assertRaises(builder.ReadingsError):
+            builder.load_readings(self.conn, self.signs, self.dir.name, warn=lambda _m: None)
+
     def test_rejects_unresolvable_form(self):
         with self.assertRaises(builder.ReadingsError):
             self.load([{"form": "ku-vin", "gloss": "x", "kind": "k", "confidence": "debated"}])

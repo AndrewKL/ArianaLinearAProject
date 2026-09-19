@@ -3,7 +3,7 @@
  * is on sign-id keys, so pasted Unicode and typed transliteration agree.
  */
 
-import type { Db, Reading, Stats, TextPage, Token, Word } from "./types";
+import type { Db, Featured, Reading, Stats, TextPage, Token, Translation, Word } from "./types";
 
 /** Unassigned code points that lineara.xyz uses; never emit them as characters. */
 const DAMAGE_MARK = "\u{1076B}";
@@ -174,6 +174,55 @@ export function displayForm(db: Db, key: string): string {
   return parts.join("-");
 }
 
+const TRANSLATION_COLUMNS = `t.text, t.notes, t.source_id, s.author, s.year, s.title,
+       s.url, s.kind, s.peer_reviewed`;
+
+function toTranslation(r: Record<string, any>): Translation {
+  return {
+    text: r.text,
+    notes: r.notes ?? null,
+    sourceId: r.source_id,
+    sourceLabel: `${String(r.author).split(" ").pop()}${r.year ? " " + r.year : ""}`,
+    sourceTitle: r.title,
+    sourceUrl: r.url ?? null,
+    sourceKind: r.kind,
+    peerReviewed: r.peer_reviewed ?? null,
+    year: r.year ?? null,
+  };
+}
+
+/** Whole-text proposals for one face. Usually none: there are 1,884 faces and one of these. */
+function translationsFor(db: Db, id: string): Translation[] {
+  return db
+    .all<Record<string, any>>(
+      `SELECT ${TRANSLATION_COLUMNS} FROM translations t
+         JOIN sources s ON s.id = t.source_id
+        WHERE t.inscription_id = ?`,
+      [id]
+    )
+    .map(toTranslation);
+}
+
+/** The most recent whole-text proposal, for the home page. */
+export function headlineTranslation(db: Db): Featured | null {
+  const row = db.all<Record<string, any>>(
+    `SELECT ${TRANSLATION_COLUMNS}, i.slug, i.id AS inscription_id, i.site, i.type
+       FROM translations t
+       JOIN sources s ON s.id = t.source_id
+       JOIN inscriptions i ON i.id = t.inscription_id
+      ORDER BY coalesce(s.date, cast(s.year AS text)) DESC, t.id DESC
+      LIMIT 1`
+  )[0];
+  if (!row) return null;
+  return {
+    ...toTranslation(row),
+    slug: row.slug,
+    inscriptionId: row.inscription_id,
+    site: row.site,
+    type: row.type,
+  };
+}
+
 export function getTextPage(db: Db, slug: string): TextPage | null {
   const row = db.all<Record<string, any>>(
     `SELECT id, slug, site, type, period, gorila_ref, museum_inventory, unicode_text, translit_text
@@ -192,6 +241,7 @@ export function getTextPage(db: Db, slug: string): TextPage | null {
     lines: row.unicode_text ? tokenize(row.unicode_text, signIndex(db)) : [],
     words,
     wordLayer: layer,
+    translations: translationsFor(db, row.id),
   };
 }
 

@@ -105,6 +105,18 @@ CREATE TABLE readings (
     notes TEXT
 );
 
+-- A proposed rendering of a whole text, as opposed to a per-word gloss.
+-- Kept apart because the claim is of a different kind: it depends on the
+-- source's own segmentation and on any restorations it makes.
+CREATE TABLE translations (
+    id INTEGER PRIMARY KEY,
+    source_id TEXT REFERENCES sources(id),
+    inscription_id TEXT REFERENCES inscriptions(id),
+    text TEXT,
+    notes TEXT
+);
+CREATE INDEX translations_inscription ON translations(inscription_id);
+
 -- Every form a reading applies to: its own plus any declared variants.
 CREATE TABLE reading_forms (
     reading_id INTEGER REFERENCES readings(id),
@@ -181,6 +193,17 @@ def load_readings(conn, signs, readings_dir=READINGS_DIR, warn=print):
                       src.get("url"), src["kind"], None if pr is None else int(bool(pr)),
                       src.get("reported_by"), src.get("notes"), path.name))
 
+        for i, tr in enumerate(doc.get("translations") or []):
+            loc = "%s translations[%d]" % (where, i)
+            for field in ("inscription", "text"):
+                if not tr.get(field):
+                    raise ReadingsError("%s: %s is required" % (loc, field))
+            if tr["inscription"] not in known_ids:
+                raise ReadingsError("%s: inscription %r is not in the corpus" % (loc, tr["inscription"]))
+            conn.execute(
+                "INSERT INTO translations (source_id, inscription_id, text, notes) VALUES (?,?,?,?)",
+                (src["id"], tr["inscription"], tr["text"], tr.get("notes")))
+
         for i, rd in enumerate(doc.get("readings") or []):
             loc = "%s readings[%d]" % (where, i)
             for field in ("form", "gloss", "kind", "confidence"):
@@ -235,7 +258,8 @@ def build(db_path=DB_PATH, log=print):
 
     conn = sqlite3.connect(str(db_path))
     counts = {t: conn.execute("SELECT count(*) FROM %s" % t).fetchone()[0]
-              for t in ("inscriptions", "words", "runs", "sign_occurrences", "signs", "sources")}
+              for t in ("inscriptions", "words", "runs", "sign_occurrences", "signs", "sources",
+                        "translations")}
     conn.close()
     log("built %s: %s, %d readings" % (
         Path(db_path).name, ", ".join("%d %s" % (v, k) for k, v in counts.items()), n))

@@ -135,6 +135,29 @@ export function Text({ data }: { data: TextData }) {
           ))}
         </ol>
       </section>
+
+      {t.translations.length > 0 && (
+        <section>
+          <h2>Proposed as a continuous text</h2>
+          {t.translations.map((translation, i) => (
+            <figure className="translation" key={i}>
+              <blockquote>“{translation.text}”</blockquote>
+              <figcaption>
+                — {translation.sourceLabel},{" "}
+                {translation.sourceUrl ? (
+                  <a href={translation.sourceUrl} rel="nofollow noopener">
+                    {translation.sourceTitle}
+                  </a>
+                ) : (
+                  translation.sourceTitle
+                )}
+                {translation.peerReviewed === 0 && `. ${translation.sourceKind}, not peer-reviewed`}
+              </figcaption>
+              {translation.notes && <p className="rests-on">{translation.notes}</p>}
+            </figure>
+          ))}
+        </section>
+      )}
     </article>
   );
 }
