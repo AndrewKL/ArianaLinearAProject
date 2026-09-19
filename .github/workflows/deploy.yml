@@ -58,16 +58,19 @@ jobs:
           BASE: /${{ github.event.repository.name }}/
         run: npm run build
 
+      # The build is made for /<repo>/, so serve it under that path or nothing
+      # resolves: assets, the database and the font are all base-relative.
       - name: Smoke test in a real browser
         working-directory: web
-        env:
-          BASE: /${{ github.event.repository.name }}/
-          CHROME: /usr/bin/google-chrome
         run: |
-          npx --yes http-server dist -p 4173 --silent &
-          sleep 2
-          node scripts/smoke.mjs "http://localhost:4173/${{ github.event.repository.name }}/?selftest" || \
-            node scripts/smoke.mjs "http://localhost:4173/?selftest"
+          mkdir -p serve/${{ github.event.repository.name }}
+          cp -R dist/. serve/${{ github.event.repository.name }}/
+          npx --yes http-server serve -p 4173 --silent &
+          for i in $(seq 1 20); do
+            curl -sf -o /dev/null "http://localhost:4173/${{ github.event.repository.name }}/" && break
+            sleep 1
+          done
+          node scripts/smoke.mjs "http://localhost:4173/${{ github.event.repository.name }}/?selftest"
 
       - uses: actions/upload-pages-artifact@v3
         with:

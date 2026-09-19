@@ -12,12 +12,23 @@
  */
 
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const CHROME =
-  process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const CANDIDATES = [
+  process.env.CHROME,
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/chromium-browser",
+  "/usr/bin/chromium",
+].filter(Boolean);
+const CHROME = CANDIDATES.find((path) => existsSync(path));
+if (!CHROME) {
+  console.error(`smoke: no browser found. Tried:\n  ${CANDIDATES.join("\n  ")}\nSet CHROME=/path/to/chrome`);
+  process.exit(1);
+}
 const URL_ = process.argv[2] ?? "http://localhost:4173/?selftest";
 const TIMEOUT_MS = 60_000;
 
