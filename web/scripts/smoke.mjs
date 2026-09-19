@@ -87,21 +87,57 @@ async function evaluate(expression) {
   return result.value;
 }
 
-const started = Date.now();
-let title = "";
-let status = "";
-while (Date.now() - started < TIMEOUT_MS) {
-  await new Promise((r) => setTimeout(r, 250));
-  title = (await evaluate("document.title")) ?? "";
-  if (title.startsWith("SELFTEST")) break;
-}
-status = (await evaluate("document.querySelector('.status')?.textContent ?? ''")) ?? "";
-const sites = await evaluate("document.querySelectorAll('.sites li').length");
-
-if (!title.startsWith("SELFTEST OK") || !sites) {
-  console.error(`smoke: FAILED\n  title:  ${title || "(timed out)"}\n  status: ${status}`);
+async function waitFor(expression, description, timeout = 45_000) {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    const value = await evaluate(expression);
+    if (value) return value;
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  console.error(`smoke: timed out waiting for ${description}`);
   cleanup(1);
 }
 
+// 1. The home page runs a query against the database in the browser.
+await waitFor("document.title.startsWith('SELFTEST') && document.title", "the in-browser query");
+const title = await evaluate("document.title");
+const status = (await evaluate("document.querySelector('.status')?.textContent ?? ''")) ?? "";
+const sites = await evaluate("document.querySelectorAll('.sites li').length");
+if (!title.startsWith("SELFTEST OK") || !sites) {
+  console.error(`smoke: FAILED\n  title:  ${title}\n  status: ${status}`);
+  cleanup(1);
+}
 console.log(`smoke: ${title} — ${status}`);
+
+// 2. Selecting a word on a text page searches the corpus for it.
+const textUrl = new URL("texts/io-za-2/", URL_.split("?")[0]).href;
+await send("Page.enable", {}, sessionId);
+await send("Page.navigate", { url: textUrl }, sessionId);
+await waitFor("!!document.querySelector('button.form')", "the text page");
+const clicked = await evaluate(
+  `(() => {
+     const target = [...document.querySelectorAll('button.form')]
+       .find((b) => b.textContent.includes('ja-sa-sa-ra-me'));
+     if (!target) return false;
+     target.click();
+     return true;
+   })()`
+);
+if (!clicked) {
+  console.error("smoke: FAILED — no ja-sa-sa-ra-me word button on the text page");
+  cleanup(1);
+}
+await waitFor("document.querySelectorAll('.explore .hits li').length", "corpus hits");
+const hits = await evaluate(
+  "[...document.querySelectorAll('.explore .hits li a')].map(a => a.textContent).join(', ')"
+);
+const similar = await evaluate(
+  "[...document.querySelectorAll('.explore .similar button')].map(b => b.textContent).join(', ')"
+);
+if (!hits.includes("PL Zf 1") || !similar.includes("sa-sa-ra-me")) {
+  console.error(`smoke: FAILED — unexpected results\n  hits: ${hits}\n  similar: ${similar}`);
+  cleanup(1);
+}
+console.log(`smoke: word search OK — also on: ${hits}`);
+console.log(`smoke: similar forms: ${similar}`);
 cleanup(0);

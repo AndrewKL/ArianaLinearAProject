@@ -1,4 +1,6 @@
-import type { Reading, TextData, Token } from "../data/types";
+import { useCallback, useState } from "react";
+import type { WordReport } from "../data/explore";
+import type { Reading, TextData, Token, Word } from "../data/types";
 
 const CONFIDENCE_BARS: Record<Reading["confidence"], string> = {
   established: "▰▰▰▰",
@@ -83,6 +85,147 @@ function ReadingRow({ reading }: { reading: Reading }) {
   );
 }
 
+function Attestations({ report, here }: { report: WordReport; here: string }) {
+  const base = import.meta.env.BASE_URL;
+  return (
+    <>
+      {report.exact.length > 0 ? (
+        <>
+          <h4>
+            Also on {report.exact.length} {report.exact.length === 1 ? "text" : "texts"}
+          </h4>
+          <ul className="hits">
+            {report.exact.map((hit) => (
+              <li key={hit.id}>
+                <a href={`${base}texts/${hit.slug}/`}>{hit.id}</a>
+                <span>{hit.site ?? "?"}</span>
+                <span>{hit.type?.replace("_", " ")}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p className="no-reading">Found nowhere else in the corpus.</p>
+      )}
+
+      {report.inside.length > 0 && (
+        <>
+          <h4>Inside a longer word</h4>
+          <ul className="hits">
+            {report.inside.map((hit) => (
+              <li key={hit.id + hit.key}>
+                <a href={`${base}texts/${hit.slug}/`}>{hit.id}</a>
+                <span className="form-inline">{hit.form}</span>
+                <span>{hit.site ?? "?"}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </>
+  );
+}
+
+/**
+ * One word, expandable. Opening it loads the corpus database into the browser
+ * and asks where else these signs occur, and which forms are one sign away —
+ * the prefix alternation (ja- / a- / none) that runs through the libation
+ * formula shows up here.
+ */
+function WordEntry({ word, here }: { word: Word; here: string }) {
+  const [open, setOpen] = useState(false);
+  const [report, setReport] = useState<WordReport | null>(null);
+  const [status, setStatus] = useState<string>("");
+
+  const explore = useCallback(
+    async (key: string) => {
+      setStatus("searching the corpus…");
+      try {
+        const [{ openDatabase }, { exploreWord }] = await Promise.all([
+          import("../data/browser"),
+          import("../data/explore"),
+        ]);
+        const db = await openDatabase();
+        setReport(exploreWord(db, key, key === word.key ? here : undefined));
+        setStatus("");
+      } catch (error) {
+        setStatus(`could not search: ${(error as Error).message}`);
+      }
+    },
+    [word.key, here]
+  );
+
+  function toggle() {
+    const next = !open;
+    setOpen(next);
+    if (next && !report && !status) void explore(word.key);
+  }
+
+  const showingOther = report && report.key !== word.key;
+
+  return (
+    <li className="word">
+      <div className="word-head">
+        <button className="form" onClick={toggle} aria-expanded={open}>
+          <span className="caret" aria-hidden="true">
+            {open ? "▾" : "▸"}
+          </span>
+          {word.form}
+        </button>
+        <span className="attest">
+          {word.attest.texts === 1
+            ? "only here"
+            : `${word.attest.texts} texts · ${word.attest.sites} sites`}
+        </span>
+      </div>
+
+      {word.readings.length > 0 ? (
+        <ul className="readings">
+          {word.readings.map((reading, i) => (
+            <ReadingRow reading={reading} key={i} />
+          ))}
+        </ul>
+      ) : (
+        <p className="no-reading">No reading recorded.</p>
+      )}
+
+      {open && (
+        <div className="explore">
+          {status && <p className="status">{status}</p>}
+          {report && (
+            <>
+              {showingOther && (
+                <p className="showing">
+                  Showing <b>{report.form}</b>.{" "}
+                  <button className="linkish" onClick={() => void explore(word.key)}>
+                    back to {word.form}
+                  </button>
+                </p>
+              )}
+              <Attestations report={report} here={here} />
+              {report.similar.length > 0 && (
+                <>
+                  <h4>Similar forms — one sign added, dropped or changed</h4>
+                  <ul className="similar">
+                    {report.similar.map((form) => (
+                      <li key={form.key}>
+                        <button className="linkish" onClick={() => void explore(form.key)}>
+                          {form.form}
+                        </button>
+                        <span className="count">{form.texts}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </li>
+  );
+}
+
 export function Text({ data }: { data: TextData }) {
   const t = data.text;
   const refs = [t.refs.gorila && `GORILA ${t.refs.gorila}`, t.refs.museum].filter(Boolean);
@@ -106,6 +249,9 @@ export function Text({ data }: { data: TextData }) {
 
       <section>
         <h2>Meaning and attestation</h2>
+        <p className="layer-note hint">
+          Select a word to search the rest of the corpus for it.
+        </p>
         <p className="layer-note">
           {t.wordLayer === "editorial"
             ? "Word divisions as the source gives them."
@@ -113,25 +259,7 @@ export function Text({ data }: { data: TextData }) {
         </p>
         <ol className="words">
           {t.words.map((word) => (
-            <li className="word" key={word.i}>
-              <div className="word-head">
-                <span className="form">{word.form}</span>
-                <span className="attest">
-                  {word.attest.texts === 1
-                    ? "only here"
-                    : `${word.attest.texts} texts · ${word.attest.sites} sites`}
-                </span>
-              </div>
-              {word.readings.length > 0 ? (
-                <ul className="readings">
-                  {word.readings.map((reading, i) => (
-                    <ReadingRow reading={reading} key={i} />
-                  ))}
-                </ul>
-              ) : (
-                <p className="no-reading">No reading recorded.</p>
-              )}
-            </li>
+            <WordEntry word={word} here={t.id} key={word.i} />
           ))}
         </ol>
       </section>

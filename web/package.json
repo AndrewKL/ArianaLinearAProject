@@ -12,7 +12,8 @@
     "preview": "vite preview --outDir dist",
     "typecheck": "tsc --noEmit",
     "check": "node scripts/check-dist.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "test": "node --experimental-strip-types --test src/data/*.test.ts"
   },
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "3.53.4-build1",

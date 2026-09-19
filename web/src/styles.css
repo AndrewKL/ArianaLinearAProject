@@ -334,3 +334,99 @@ footer {
   font-size: 0.85rem;
   color: var(--muted);
 }
+
+/* --- exploring a word across the corpus --- */
+.hint {
+  font-style: italic;
+}
+button.form {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.15rem 0.3rem 0.15rem 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+button.form:hover,
+button.form:focus-visible {
+  color: var(--accent);
+}
+.caret {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.explore {
+  margin: 0.6rem 0 0.2rem;
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--rule);
+  background: color-mix(in srgb, var(--paper) 88%, var(--ink) 4%);
+  border-radius: 0 4px 4px 0;
+}
+.explore h4 {
+  margin: 0.9rem 0 0.35rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.explore h4:first-child {
+  margin-top: 0;
+}
+.hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+}
+.hits li {
+  display: grid;
+  grid-template-columns: 7.5rem 10rem 1fr;
+  gap: 0.75rem;
+}
+.hits span,
+.count {
+  color: var(--muted);
+}
+.form-inline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.similar {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+}
+.similar li {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+button.linkish {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.showing {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+@media (max-width: 40rem) {
+  .hits li {
+    grid-template-columns: 6rem 1fr;
+  }
+}
