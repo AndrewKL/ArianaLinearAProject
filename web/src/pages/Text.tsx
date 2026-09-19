@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import type { WordReport } from "../data/explore";
-import type { Reading, TextData, Token, Word } from "../data/types";
+import type { Image, Reading, TextData, Token, Word } from "../data/types";
 
 const CONFIDENCE_BARS: Record<Reading["confidence"], string> = {
   established: "▰▰▰▰",
@@ -226,6 +226,43 @@ function WordEntry({ word, here }: { word: Word; here: string }) {
   );
 }
 
+const IMAGE_LABEL: Record<Image["kind"], string> = {
+  facsimile: "Facsimile drawing",
+  photograph: "Photograph",
+};
+
+/**
+ * The drawing first: it is what the transliteration was read from and stays
+ * legible small; the photograph is the evidence behind the drawing. Each
+ * carries its own credit, because the two may not always share a source.
+ */
+function Plates({ images, id }: { images: Image[]; id: string }) {
+  if (images.length === 0) return null;
+  const base = import.meta.env.BASE_URL;
+  return (
+    <aside className="plates">
+      {images.map((image) => (
+        <figure key={image.src}>
+          <a href={`${base}img/${image.src}`}>
+            <img
+              src={`${base}img/${image.src}`}
+              width={image.width ?? undefined}
+              height={image.height ?? undefined}
+              loading="lazy"
+              decoding="async"
+              alt={`${IMAGE_LABEL[image.kind]} of ${id}. The text is transcribed beside it.`}
+            />
+          </a>
+          <figcaption>
+            <a href={`${base}img/${image.src}`}>{IMAGE_LABEL[image.kind]} — full size</a>
+            <span className="credit">{image.credit}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </aside>
+  );
+}
+
 export function Text({ data }: { data: TextData }) {
   const t = data.text;
   const refs = [t.refs.gorila && `GORILA ${t.refs.gorila}`, t.refs.museum].filter(Boolean);
@@ -237,6 +274,9 @@ export function Text({ data }: { data: TextData }) {
         {refs.length > 0 && <span className="refs"> — {refs.join(" · ")}</span>}
       </p>
 
+      <div className={t.images.length > 0 ? "with-plates" : undefined}>
+        <Plates images={t.images} id={t.id} />
+        <div className="reading-column">
       <section className="text-block" aria-label={`Transliteration of ${t.id}`}>
         {t.lines.map((line) => (
           <p className="line" key={line.n}>
@@ -286,6 +326,8 @@ export function Text({ data }: { data: TextData }) {
           ))}
         </section>
       )}
+        </div>
+      </div>
     </article>
   );
 }

@@ -61,11 +61,22 @@ for (const file of files) {
     failures.push(`${name}: ${signCells} sign cells but only ${translits} transliterations`);
   }
 
+  // Images: the file must exist, and alt text must describe the object —
+  // a screen reader gets nothing from the glyphs themselves.
+  for (const [tag, src] of html.matchAll(/<img[^>]*src="([^"]+)"[^>]*>/g)) {
+    if (!src.startsWith(BASE)) continue;
+    if (!existsSync(join(DIST, src.slice(BASE.length)))) {
+      failures.push(`${name}: missing image ${src}`);
+    }
+    if (!/alt="[^"]+"/.test(tag)) failures.push(`${name}: image without alt text`);
+  }
+
   for (const [, href] of html.matchAll(/href="([^"]+)"/g)) {
     if (!href.startsWith(BASE) || href.startsWith("//")) continue;
     const rel = href.slice(BASE.length).split(/[?#]/)[0];
+    if (existsSync(join(DIST, rel))) continue; // a file: image, font, data
     const target = rel === "" ? join(DIST, "index.html") : join(DIST, rel, "index.html");
-    if (!existsSync(target) && !existsSync(join(DIST, rel))) {
+    if (!existsSync(target)) {
       failures.push(`${name}: dead internal link ${href}`);
     }
   }

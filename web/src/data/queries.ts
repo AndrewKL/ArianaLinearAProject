@@ -3,7 +3,7 @@
  * is on sign-id keys, so pasted Unicode and typed transliteration agree.
  */
 
-import type { Db, Featured, Reading, Stats, TextPage, Token, Translation, Word } from "./types";
+import type { Db, Featured, Image, Reading, Stats, TextPage, Token, Translation, Word } from "./types";
 
 /** Unassigned code points that lineara.xyz uses; never emit them as characters. */
 const DAMAGE_MARK = "\u{1076B}";
@@ -223,6 +223,22 @@ export function headlineTranslation(db: Db): Featured | null {
   };
 }
 
+/** The facsimile drawing and the photograph, where this build has them. */
+function imagesFor(db: Db, id: string): Image[] {
+  return db
+    .all<{ kind: string; file: string; width: number | null; height: number | null; credit: string }>(
+      "SELECT kind, file, width, height, credit FROM images WHERE inscription_id = ? ORDER BY sort",
+      [id]
+    )
+    .map((row) => ({
+      kind: row.kind as Image["kind"],
+      src: row.file,
+      width: row.width ?? null,
+      height: row.height ?? null,
+      credit: row.credit,
+    }));
+}
+
 export function getTextPage(db: Db, slug: string): TextPage | null {
   const row = db.all<Record<string, any>>(
     `SELECT id, slug, site, type, period, gorila_ref, museum_inventory, unicode_text, translit_text
@@ -238,6 +254,7 @@ export function getTextPage(db: Db, slug: string): TextPage | null {
     type: row.type,
     period: row.period,
     refs: { gorila: row.gorila_ref, museum: row.museum_inventory },
+    images: imagesFor(db, row.id),
     lines: row.unicode_text ? tokenize(row.unicode_text, signIndex(db)) : [],
     words,
     wordLayer: layer,

@@ -226,10 +226,13 @@ text page have at least one image**, 79 MB in total.
 - Alt text describes the object and refers the reader to the transliteration
   ("Stone libation table, inscribed on two faces; text transcribed below"),
   never "image of an inscription".
-- **Images are an optional layer**, switched by one build flag
-  (`images: none | local | published`), because the rights question below is
-  unresolved and must not be wired into the templates. The site has to be
-  correct and complete without them.
+- **Images are an optional layer.** *Built:* `python3 -m lineara site data`
+  copies them from `data/upstream/lineara-images/` into `web/public/img/` and
+  records each one — kind, dimensions and credit — in an `images` table;
+  `--no-images` skips them. The switch is the presence of the files, which are
+  gitignored and never in CI, so a build without them is simply a build
+  without images and the pages stay correct. 1,042 images cover 537 of the 554
+  faces that get a full page.
 
 ## Typography and the three token types
 
@@ -533,7 +536,9 @@ the dataset citation, not just the URL.
    where React earns its keep.
 3. **The long tail.** Full pages out to all 554 faces with 2+ signs; grouped
    pages for the 1,330 single-sign and blank faces; sign chart; site pages.
-4. **Images**, once the rights question is settled, behind the build flag.
+4. **Images** — *built locally*, behind the file-presence switch. What remains
+   is the rights question, not the code: nothing may be published until the
+   EFA question is settled.
 5. **Readings as a contribution surface.** A documented path for someone to
    propose a reading as a pull request against `readings/*.json`, since the
    schema already validates and the build already fails loudly on bad data.

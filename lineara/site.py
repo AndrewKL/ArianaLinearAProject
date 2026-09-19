@@ -15,9 +15,11 @@ See docs/website-design.md.
 
 import gzip
 import hashlib
+import json
 import re
 import shutil
 import sqlite3
+import struct
 from pathlib import Path
 
 from . import build as builder
@@ -25,6 +27,14 @@ from . import build as builder
 ROOT = builder.ROOT
 WEB_DIR = ROOT / "web" / "public" / "data"
 WEB_DB = WEB_DIR / "web.db"
+
+# Inscription photographs and GORILA facsimile drawings, fetched from
+# lineara.xyz. Not committed, and not published: see docs/website-design.md,
+# "Rights". The site renders them only where these files are present, so a
+# build without them is simply a build without images.
+IMAGE_SOURCE = ROOT / "data" / "upstream" / "lineara-images"
+WEB_IMG = ROOT / "web" / "public" / "img"
+IMAGE_CREDIT = "\u00a9 \u00c9cole Fran\u00e7aise d'Ath\u00e8nes, via lineara.xyz"
 
 # The only non-ASCII characters in the corpus ids.
 GREEK = {"α": "a", "β": "b", "γ": "g"}
@@ -58,20 +68,93 @@ def slugs_for(ids):
     return out
 
 
+def image_size(path):
+    """(width, height) for a JPEG or PNG, or (None, None). Set on the page so
+    images do not shift the layout as they load."""
+    data = path.read_bytes()
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return struct.unpack(">II", data[16:24])
+    if data[:2] == b"\xff\xd8":
+        i = 2
+        while i + 9 < len(data):
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            marker, length = data[i + 1], struct.unpack(">H", data[i + 2:i + 4])[0]
+            if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+                height, width = struct.unpack(">HH", data[i + 5:i + 9])
+                return width, height
+            i += 2 + length
+    return None, None
+
+
+def collect_images(conn, source=IMAGE_SOURCE, out=WEB_IMG, log=print):
+    """Copy the images for every face that gets a full page, and record them.
+
+    One face has up to two: the GORILA facsimile drawing and a photograph. The
+    drawing comes first on the page — it is what the transliteration was read
+    from, and it stays legible small.
+    """
+    if not Path(source).is_dir():
+        log("no images at %s; building without them" % source)
+        return 0
+    available = {p.name: p for p in Path(source).iterdir() if p.suffix.lower() in (".jpg", ".png")}
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+
+    rows = conn.execute("""SELECT i.id, i.slug, src.raw FROM inscriptions i
+                             JOIN src.inscriptions src ON src.id = i.id
+                            WHERE (SELECT coalesce(sum(n_signs), 0) FROM runs
+                                    WHERE inscription_id = i.id) >= 2""").fetchall()
+    found = 0
+    for iid, slug, raw in rows:
+        lineara_id = (json.loads(raw).get("lineara_id") if raw else None) or iid.replace(" ", "")
+        for order, kind in enumerate(("facsimile", "photograph")):
+            stem = "Facsimile" if kind == "facsimile" else "Inscription"
+            for suffix in (".jpg", ".png"):
+                name = "%s-%s%s" % (lineara_id, stem, suffix)
+                if name not in available:
+                    continue
+                target = "%s-%s%s" % (slug, kind, suffix)
+                shutil.copyfile(available[name], out / target)
+                width, height = image_size(available[name])
+                conn.execute(
+                    "INSERT INTO images (inscription_id, kind, sort, file, width, height, credit)"
+                    " VALUES (?,?,?,?,?,?,?)",
+                    (iid, kind, order, target, width, height, IMAGE_CREDIT))
+                found += 1
+                break
+    log("copied %d images for %d faces into %s" % (found, len(rows), out.relative_to(ROOT)))
+    return found
+
+
 def _web_schema():
     """builder.SCHEMA with `raw` swapped for `slug`."""
     schema = builder.SCHEMA
     raw_col = "    raw TEXT                      -- the full upstream record, JSON\n"
     slug_col = "    slug TEXT NOT NULL            -- URL segment, see slugs_for()\n"
     assert raw_col in schema, "inscriptions.raw column not found in build.SCHEMA"
-    return schema.replace(raw_col, slug_col) + "\nCREATE UNIQUE INDEX inscriptions_slug ON inscriptions(slug);\n"
+    images = """
+CREATE TABLE images (
+    id INTEGER PRIMARY KEY,
+    inscription_id TEXT REFERENCES inscriptions(id),
+    kind TEXT,                    -- facsimile | photograph
+    sort INTEGER,                 -- facsimile first
+    file TEXT,                    -- name under web/public/img/
+    width INTEGER, height INTEGER,
+    credit TEXT NOT NULL          -- shown with the image, never omitted
+);
+CREATE INDEX images_inscription ON images(inscription_id);
+"""
+    return (schema.replace(raw_col, slug_col)
+            + "\nCREATE UNIQUE INDEX inscriptions_slug ON inscriptions(slug);\n" + images)
 
 
 TABLES = ["meta", "signs", "words", "runs", "sign_occurrences",
           "sources", "readings", "reading_forms", "translations"]
 
 
-def export(db_path=builder.DB_PATH, out=WEB_DB, log=print):
+def export(db_path=builder.DB_PATH, out=WEB_DB, log=print, images=True):
     if not Path(db_path).exists():
         raise SystemExit("No database at %s. Run: python3 -m lineara build" % db_path)
     out = Path(out)
@@ -100,6 +183,9 @@ def export(db_path=builder.DB_PATH, out=WEB_DB, log=print):
             cols = [r[1] for r in conn.execute("PRAGMA table_info(%s)" % table)]
             conn.execute("INSERT INTO %s (%s) SELECT %s FROM src.%s" % (
                 table, ", ".join(cols), ", ".join(cols), table))
+
+        if images:
+            collect_images(conn, log=log)
 
         conn.commit()
         conn.execute("DETACH DATABASE src")

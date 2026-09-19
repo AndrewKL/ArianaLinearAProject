@@ -47,10 +47,19 @@ export interface TextPage {
   type: string | null;
   period: string | null;
   refs: { gorila: string | null; museum: string | null };
+  images: Image[];
   lines: { n: number; tokens: Token[] }[];
   words: Word[];
   wordLayer: "editorial" | "mechanical";
   translations: Translation[];
+}
+
+export interface Image {
+  kind: "facsimile" | "photograph";
+  src: string;
+  width: number | null;
+  height: number | null;
+  credit: string;
 }
 
 export interface Translation {

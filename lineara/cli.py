@@ -161,7 +161,7 @@ def cmd_fetch(args):
 
 def cmd_site(args):
     from . import site
-    site.export(args.db)
+    site.export(args.db, images=not args.no_images)
 
 
 def cmd_build(args):
@@ -372,6 +372,8 @@ def main(argv=None):
     s = sub.add_parser("site", help="build web.db for the website")
     site_sub = s.add_subparsers(dest="site_cmd", required=True)
     d = site_sub.add_parser("data", help="export web/public/data/web.db (+ .gz)")
+    d.add_argument("--no-images", action="store_true",
+                   help="skip the inscription images even if they are present locally")
     d.set_defaults(fn=cmd_site)
 
     s = sub.add_parser("show", help="one inscription: text, words, readings")

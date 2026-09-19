@@ -430,3 +430,64 @@ button.linkish {
     grid-template-columns: 6rem 1fr;
   }
 }
+
+/* --- plates: the facsimile drawing and the photograph --- */
+.with-plates {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  gap: 1.25rem;
+  align-items: start;
+}
+.with-plates .text-block {
+  margin-top: 1.5rem;
+}
+.reading-column {
+  min-width: 0;
+}
+.plates {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  order: 2;
+  /* Keep the object in view while reading the words beside it. */
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+}
+.plates img {
+  max-height: 17rem;
+}
+.plates figure {
+  margin: 0;
+}
+.plates img {
+  display: block;
+  /* Plates stack several views of one object, so they are tall. Cap the
+     height and let the caption link reach the full-size file. */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 24rem;
+  margin-inline: auto;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: #fff;
+}
+.plates figcaption {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.credit {
+  display: block;
+}
+@media (max-width: 52rem) {
+  .with-plates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .plates {
+    order: 0;
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+}
