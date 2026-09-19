@@ -1,7 +1,8 @@
 # Design doc: a browsable Linear A corpus website
 
-Status: draft for review. Build target deliberately left open (see
-[Open questions](#open-questions)).
+Status: draft for review. Stack decided: **React over a SQLite database
+compiled to WebAssembly, prerendered and served from GitHub Pages**
+(see [Stack](#stack-react-sqlite-in-the-browser-github-pages)).
 
 ## What it is
 
@@ -196,6 +197,40 @@ Genre is chosen by a rule, stored in the export: `ledger` if the face has
 numerals or logograms in list position, else `running`. Faces of ≤1 sign use
 the compact view.
 
+### Images: facsimile and photograph
+
+lineara.xyz carries two images for most faces: a photograph (`-Inscription`)
+and the GORILA facsimile drawing (`-Facsimile`). 3,481 files, 141 MB, average
+39 KB — they are already web-sized. **537 of the 554 faces that get a full
+text page have at least one image**, 79 MB in total.
+
+```
+┌────────────────────────────────┬─────────────────────┐
+│  𐘇𐘳𐘚𐙕𐘮𐘱 · 𐘱𐘆𐘸𐘹 · …      │  ┌───────────────┐  │
+│  a-ta-i-*301-wa-ja  ja-di-ki-tu│  │   facsimile   │  │
+│                                │  │    drawing    │  │
+│  MEANING AND ATTESTATION       │  └───────────────┘  │
+│  …                             │  ┌───────────────┐  │
+│                                │  │  photograph   │  │
+│                                │  └───────────────┘  │
+│                                │  GORILA 4 p. 8      │
+│                                │  © EFA · source ↗   │
+└────────────────────────────────┴─────────────────────┘
+```
+
+- **Facsimile first.** The drawing is what the transliteration was read from,
+  and it stays legible at small sizes; the photograph is the evidence behind
+  the drawing. On narrow screens the panel moves below the text.
+- Click to enlarge. `loading="lazy"`, explicit `width`/`height` to avoid
+  layout shift, and a credit line attached to each image, not to the page.
+- Alt text describes the object and refers the reader to the transliteration
+  ("Stone libation table, inscribed on two faces; text transcribed below"),
+  never "image of an inscription".
+- **Images are an optional layer**, switched by one build flag
+  (`images: none | local | published`), because the rights question below is
+  unresolved and must not be wired into the templates. The site has to be
+  correct and complete without them.
+
 ## Typography and the three token types
 
 The transliteration layer must not make everything look like a spoken word.
@@ -225,9 +260,12 @@ without a font that covers it.
 - Self-host **Noto Sans Linear A** as WOFF2, subset to U+10600–U+1077F, with
   `font-display: swap` and a `unicode-range` descriptor.
 - Aegean numerals and word dividers (U+10100–U+1013F) are a **separate block**
-  and may need a second font (Noto Sans Symbols 2). Verify coverage before
-  committing to it; if the numeral glyphs are unavailable, render numerals as
-  digits, which is what the transliteration layer does anyway.
+  and need a second font. lineara.xyz ships exactly two font files for this,
+  `NotoSansLinearA-LinearB.ttf` and `NotoSansSymbols2-Regular.ttf`, which is
+  good evidence that Noto Sans Symbols 2 is the one that covers the Aegean
+  block. Confirm by subsetting before committing to it; if the numeral glyphs
+  turn out to be unavailable, render numerals as digits, which is what the
+  transliteration layer does anyway.
 - Glyphs are intricate. Set the Linear A layer at ~2rem minimum with generous
   `letter-spacing`; do not let it inherit body size.
 - Run a **font load check**: if the font fails, show a one-line notice above
@@ -272,55 +310,115 @@ on" disclosure. For the conventional readings this is checkable evidence
 (the HT 13 sum); for speculative ones it is usually the absence of evidence,
 which is equally worth showing.
 
-## Data shape
+## Stack: React, SQLite in the browser, GitHub Pages
 
-The site consumes JSON generated from `lineara.db`, so the site has no
-database at runtime. One file per text page:
+| Layer | Choice |
+|---|---|
+| UI | React + TypeScript, built with Vite |
+| Data | `@sqlite.org/sqlite-wasm`: the corpus database fetched once and queried in the browser |
+| Pages | Every route prerendered to real HTML at build time, then hydrated |
+| Routing | React Router, with prerendered entry files and a `404.html` fallback |
+| Styling | Hand-written CSS modules |
+| Deploy | GitHub Actions → `upload-pages-artifact` + `deploy-pages` |
+| Data build | The existing Python pipeline, which emits `web.db` |
 
-```json
-{
-  "id": "IO Za 2", "slug": "io-za-2",
-  "site": "Iouktas", "type": "stone_vessel", "period": null,
-  "layout": "running",
-  "refs": { "gorila": "4, p. 8", "museum": "HM 3642" },
-  "lines": [
-    { "n": 0, "tokens": [
-      { "k": "sign", "i": 0, "id": "AB08", "g": "𐘇", "t": "a",    "w": 0 },
-      { "k": "sign", "i": 1, "id": "AB59", "g": "𐘳", "t": "ta",   "w": 0 },
-      { "k": "sign", "i": 3, "id": "A301", "g": "𐙕", "t": "*301", "w": 0, "novalue": true },
-      { "k": "div" },
-      { "k": "mark", "kind": "damage" },
-      { "k": "num", "v": 130 },
-      { "k": "logo", "id": "AB120", "t": "GRA" }
-    ] }
-  ],
-  "words": [
-    {
-      "i": 0, "key": "AB08 AB59 AB28 A301 AB54 AB57",
-      "form": "a-ta-i-*301-wa-ja", "signs": [0,1,2,3,4,5],
-      "layer": "editorial",
-      "attest": { "texts": 11, "sites": 5, "href": "/words/a-ta-i-301-wa-ja" },
-      "readings": [
-        { "gloss": "opening element of the libation formula; meaning unknown",
-          "confidence": "established", "source": "conventional",
-          "scope": "exact", "basis": "Stands first on stone libation vessels…" }
-      ]
-    }
-  ],
-  "whole_text_readings": [
-    { "text": "Father of the Bull-Contest of Dikte…", "source": "schumann-2026",
-      "peer_reviewed": false }
-  ],
-  "notes": { "unglossed_words": 4, "segmentation_disputes": [ { "word": 6, "source": "schumann-2026" } ] }
-}
+### Why SQLite in the browser
+
+- **The queries already exist.** Attestation, sub-sequence containment and
+  the confidence ordering are SQL in the CLI today, and they transfer to the
+  site unchanged. One query language across the terminal and the web, one
+  place where "where else does this word occur" is defined.
+- **It is smaller than the JSON it replaces.** Measured: the database with
+  the `raw` column dropped is **380 KB gzipped**. Per-text JSON files plus a
+  separate search index would total more and duplicate the same rows.
+- **Search becomes a query, not an index.** Matching is on sign-id keys
+  (`instr(' ' || key || ' ', ' ' || ? || ' ')`), which works verbatim in the
+  browser. A JavaScript search library would tokenize `*301` and astral
+  glyphs wrongly; see [Search](#search).
+- **Nothing to operate.** The database is read-only and versioned with the
+  corpus. Pages serves bytes; there is no server to keep alive, which suits a
+  project whose value is archival.
+
+### Why prerender rather than a plain SPA
+
+GitHub Pages has no rewrite rules, so in a pure SPA `/texts/io-za-2` returns
+a 404 on a cold visit. Prerendering each route to a real HTML file fixes that,
+and pays for itself three more times: crawlers and link previews see content,
+readers without JavaScript still get the text, and first paint does not wait
+on a WebAssembly runtime plus a database download.
+
+The prerender step runs in Node against the *same* `web.db` (via
+`better-sqlite3`), so there is exactly one data source. SQLite-wasm then loads
+lazily in the browser, only for the views that need the whole corpus: search,
+word pages, filtered indexes.
+
+### Why React
+
+Most of this site is static text, and React does not earn its place there. It
+earns it on four things: alignment highlighting across three layers, the
+search view, filtered indexes, and the per-reading disclosures — plus a
+component model for the many small repeated pieces (sign, word, reading,
+confidence badge, credit line). The cost is the prerender-and-hydrate
+pipeline above. Without those interactions, a plain static generator would be
+the simpler answer.
+
+### Constraints this imposes
+
+- **No custom headers on Pages**, so no COOP/COEP, so no `SharedArrayBuffer`.
+  Use the single-threaded, in-memory sqlite-wasm build. No OPFS persistence;
+  cache the database bytes in Cache Storage instead.
+- **Pages does not compress `application/octet-stream`.** Shipping `web.db`
+  raw means 2.4 MB on the wire instead of 380 KB. Ship `web.db.gz` and inflate
+  it with `DecompressionStream('gzip')`, and keep the raw file as a fallback.
+- **Two toolchains**: Python for the data, Node for the site. The boundary is
+  `web.db`, and it is the only thing they share.
+- Pages soft limits: 1 GB per site, ~100 GB/month bandwidth. The database is
+  irrelevant against that; the images are not.
+
+## Data access
+
+`python3 -m lineara site data` derives `web.db` from `lineara.db`: drop the
+`raw` column, add the `slug` column, keep the indexes, `VACUUM`, then gzip.
+
+Prerender and client share one shape. The props a text page receives:
+
+```ts
+type TextPage = {
+  id: string; slug: string;                    // "IO Za 2", "io-za-2"
+  site: string | null; type: string | null; period: string | null;
+  layout: "running" | "ledger" | "compact";
+  refs: { gorila?: string; museum?: string };
+  images: { kind: "facsimile" | "photograph"; src: string; credit: string }[];
+  lines: { n: number; tokens: Token[] }[];
+  words: Word[];
+  wholeTextReadings: { text: string; source: SourceRef; peerReviewed: boolean }[];
+  notes: { unglossedWords: number; segmentationDisputes: Dispute[] };
+};
+
+type Token =
+  | { k: "sign"; i: number; id: string; g: string; t: string; w: number; novalue?: boolean }
+  | { k: "logo"; id: string; t: string }      // GRA, VIN, OLE
+  | { k: "num"; v: number }
+  | { k: "frac"; id: string; t: string }      // sign label, never a numeric value
+  | { k: "div" }                               // word divider
+  | { k: "mark"; kind: "damage" };             // U+1076B, never emitted as a character
+
+type Word = {
+  i: number; key: string;                      // "AB08 AB59 AB28 A301 AB54 AB57"
+  form: string;                                // "a-ta-i-*301-wa-ja"
+  signs: number[];                             // token indices, for alignment
+  layer: "editorial" | "mechanical";
+  attest: { texts: number; sites: number; href: string };
+  readings: Reading[];                         // [] is the common case
+};
 ```
 
-Two fields need adding to the pipeline, both small:
+Two additions to the Python pipeline, both small:
 
-- **`slug`** on every inscription, generated and stored so URLs are stable.
-- **`whole_text_readings`**: the readings schema is per-word; a full-sentence
-  translation belongs to the text. Add an optional `translations` array to the
-  readings file format, keyed by inscription id.
+- **`slug`** on every inscription, generated once and stored, so URLs are stable.
+- **`translations`**: the readings schema is per-word; a full-sentence
+  translation belongs to the text. Add an optional array to the readings file
+  format, keyed by inscription id.
 
 ### URL slugs
 
@@ -336,9 +434,9 @@ corpus is rebuilt. Generated slugs are stored, not recomputed at request time.
 
 ## Search
 
-The corpus is small enough to search entirely in the browser: 1,101 word
-types, 1,884 texts. Ship a prebuilt index (expected well under 1 MB,
-gzip-compressed, loaded lazily on first use).
+Search is a SQL query against the database already in the browser. There is
+no separate index to build, ship or keep in sync: 1,101 word types and 1,884
+texts are nothing for SQLite, and the matching rules are the CLI's.
 
 The input must accept all of these, because a visitor will paste whatever
 they have:
@@ -348,9 +446,13 @@ they have:
 - sign ids (`AB57`), inscription ids (`IO Za 2`, `iozA2`), sites, museum numbers
 
 All of them normalise through the same sign-id key the CLI uses, so
-`𐙂𐘁`, `ku-ro` and `KURO` land on one result. When there is no match,
-offer near misses using the existing one-sign edit distance, which is what
-surfaces the JA- / A- / zero alternation in the formula.
+`𐙂𐘁`, `ku-ro` and `KURO` land on one result. That normaliser is the one
+piece of `signs.py` that must be reimplemented in TypeScript (about 50 lines:
+glyph → sign id, transliteration token → sign id, key → display form); it is
+worth porting rather than wrapping, and it needs its own tests on both sides.
+When there is no match, offer near misses with the existing one-sign edit
+distance, which is what surfaces the JA- / A- / zero alternation in the
+formula.
 
 ## Accessibility
 
@@ -368,6 +470,8 @@ be announced as unknown characters or skipped.
 - Tap targets ≥44px on the sign layer; the glyphs are large already, but the
   transliteration row is not.
 - Respect `prefers-reduced-motion` for any highlight transition.
+- The prerendered HTML must be complete text, not a loading shell: the page
+  has to be readable before hydration and with JavaScript disabled entirely.
 - Confidence must be legible without colour (see above), and the whole page
   must survive at 200% zoom and at 400px width, where the interlinear layout
   needs to wrap per word rather than scroll horizontally.
@@ -381,10 +485,21 @@ The data is not freely licensed, and the site must reflect that:
   SigLA (Salgarella & Castellan) and to the Navarre-AI dataset on every page
   or in a site-wide credit that is one click from every page.
 - lineara.xyz's Unicode text carries **no licence**. Credit it and link to it.
-- **Do not publish inscription photographs or tracings.** SigLA's tracings are
-  NC-SA, and the lineara.xyz photographs are © École Française d'Athènes.
-  Link out to the source pages instead. This is the main reason the design
-  above is typographic rather than photographic.
+- **The images are the sharpest constraint.** Both the photographs and the
+  facsimile drawings from lineara.xyz are GORILA plate material, marked
+  © École Française d'Athènes in lineara.xyz's own metadata. Holding local
+  copies for development is one thing; publishing them on GitHub Pages is
+  redistribution. Three routes, in order of preference: ask the EFA for
+  permission; use SigLA's tracings where they cover the same object, which are
+  CC BY-NC-SA and so publishable with attribution, non-commercially, with
+  share-alike; or link out to the source pages and ship no images. This is why
+  images are a build flag, not a template assumption.
+- **Publishing the database is itself redistribution.** `web.db` embeds the
+  Unicode text from lineara.xyz, which carries no licence at all — the
+  upstream Navarre dataset deliberately declines to redistribute it. Before
+  any public deploy: ask lineara.xyz for permission, or build `web.db` from
+  the SigLA-derived fields only, which covers the 762 faces that have
+  per-sign data.
 - GORILA and RILA are in copyright: cite volume and page, never reproduce.
 
 `/about` carries the full provenance chain, the licences, and a "how to cite"
@@ -393,40 +508,49 @@ the dataset citation, not just the URL.
 
 ## Phases
 
-1. **The text page, on the 298 substantive faces.** Three layers, alignment,
-   both genres, fonts, per-word attestation. This is the whole design risk.
-2. **Word pages and search.** `/words/ku-ro` and the client-side index. This
-   is where the site becomes more useful than a PDF.
-3. **The long tail.** Grouped pages for the 1,330 single-sign and blank faces;
-   sign chart; site pages.
-4. **Readings as a contribution surface.** A documented path for someone to
+1. **The text page, prerendered, on the 298 faces with 5+ signs.** Three
+   layers, alignment, both genres, fonts, per-word attestation — with the
+   Vite build, the `web.db` step and the Actions deploy wired up end to end.
+   This carries the whole design risk and most of the stack risk.
+2. **SQLite in the browser: word pages and search.** `/words/ku-ro` and the
+   query layer. This is where the site becomes more useful than a PDF, and
+   where React earns its keep.
+3. **The long tail.** Full pages out to all 554 faces with 2+ signs; grouped
+   pages for the 1,330 single-sign and blank faces; sign chart; site pages.
+4. **Images**, once the rights question is settled, behind the build flag.
+5. **Readings as a contribution surface.** A documented path for someone to
    propose a reading as a pull request against `readings/*.json`, since the
    schema already validates and the build already fails loudly on bad data.
 
 ## Open questions
 
-1. **Build target.** Static generator in this repo (`python3 -m lineara site
-   build`), a JS framework, or something else. The data shape above is
-   deliberately generator-agnostic. Recommendation: static generation, because
-   the data changes only when the corpus does, and static files match the
-   non-commercial, archival character of the project.
-2. **Is the whole-text translation section wise at all?** It is the part a
+1. **Image rights.** Blocks any public deploy that includes images. Ask the
+   EFA, fall back to SigLA tracings, or link out. Local development copies are
+   unaffected.
+2. **The lineara.xyz licence.** Blocks publishing `web.db` as it stands, since
+   the Unicode text is unlicensed. Ask, or rebuild the published database from
+   SigLA-derived fields only.
+3. **Is the whole-text translation section wise at all?** It is the part a
    news reader wants and the part most likely to be quoted out of context. The
    design above shows it last, attributed, with the caveat attached. An
    alternative is to omit it and show only per-word glosses.
-3. **Should mechanical runs appear on text pages?** They cover the ~1,000
+4. **Should mechanical runs appear on text pages?** They cover the ~1,000
    faces with no editorial word division, but they are not words. Suggest:
    show them, clearly labelled "no editorial word division", with a one-line
    explanation of what that means.
-4. **Dating.** The corpus has both `period` (SigLA) and `gorila_dating` in
+5. **Dating.** The corpus has both `period` (SigLA) and `gorila_dating` in
    different vocabularies (`LM IB` vs `MR I B`), and 16 records carry
    unresolved conflicts. Either show both with sources, or normalise and
    document the mapping. Do not silently pick one.
 
 ### To verify before building
 
-- Noto Sans Linear A's coverage of U+10100–U+1013F (Aegean numbers), and
-  whether a second font is needed.
+- That Noto Sans Symbols 2 covers U+10100–U+1013F (Aegean numbers), as
+  lineara.xyz's bundled fonts suggest.
 - The `lab` language subtag and `Lina` script subtag.
 - That the damage mark and the four unassigned code points are handled
-  everywhere text is emitted, including copy-to-clipboard and the search index.
+  everywhere text is emitted: the page, copy-to-clipboard, `aria-label`s, the
+  prerendered HTML and every search result.
+- That single-threaded sqlite-wasm runs on Pages without COOP/COEP headers,
+  and that `DecompressionStream('gzip')` is available in the browsers you
+  intend to support.
