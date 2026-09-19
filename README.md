@@ -254,6 +254,15 @@ non-commercial and share-alike. See the upstream
 The Schümann preprint is CC BY 4.0. The glosses here are short quotations,
 with attribution.
 
+## A website for this data
+
+`docs/website-design.md` is a design doc for a browsable website built on
+`lineara.db`: every text with its Linear A, its transliteration, and the
+competing proposed meanings per word. It covers page anatomy, the two
+document genres, typography and font handling, the JSON data shape, URLs,
+search, accessibility and the licensing constraints. The build target is
+left open.
+
 ## Limitations
 
 - **Sign assignments are only as good as the source.** Unicode encodes sign
