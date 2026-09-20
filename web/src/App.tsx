@@ -1,4 +1,5 @@
 import type { PageData } from "./data/types";
+import { About } from "./pages/About";
 import { Home } from "./pages/Home";
 import { Text } from "./pages/Text";
 
@@ -8,8 +9,19 @@ export function App({ data }: { data: PageData }) {
       <header className="masthead">
         <a href={import.meta.env.BASE_URL}>The Ariana Project</a>
         <span className="masthead-note">undeciphered · readings are proposals, not translations</span>
+        <a className="masthead-link" href={`${import.meta.env.BASE_URL}about/`}>
+          Who were the Minoans?
+        </a>
       </header>
-      <main>{data.route === "home" ? <Home data={data} /> : <Text data={data} />}</main>
+      <main>
+        {data.route === "home" ? (
+          <Home data={data} />
+        ) : data.route === "about" ? (
+          <About data={data} />
+        ) : (
+          <Text data={data} />
+        )}
+      </main>
       <footer>
         <p>
           Corpus data from{" "}

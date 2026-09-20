@@ -48,7 +48,7 @@ rewrite rules — and because the text should be readable without JavaScript.
   cannot pronounce Linear A, so that last one is an accessibility check.
 - `scripts/smoke.mjs` — drives headless Chrome over the DevTools protocol and
   checks that sqlite-wasm boots, the database inflates and a query returns
-  rows. Node cannot exercise that path. Set `CHROME=` to point at a browser.
+  rows, and that the about page survives hydration. Node cannot exercise that path. Set `CHROME=` to point at a browser.
   It loads `/?selftest`, which makes the page run its query on load.
 
 ## Layout
@@ -63,6 +63,7 @@ src/
   pages/
     Home.tsx      corpus summary, featured texts, in-browser query
     Text.tsx      one face: signs, transliteration, readings
+    About.tsx     ../docs/who-were-the-minoans.md, converted at prerender
   App.tsx, main.tsx (hydrate), entry-server.tsx (render + route data)
 public/
   fonts/          Noto Sans Linear A, SIL OFL 1.1 — see FONTS.md

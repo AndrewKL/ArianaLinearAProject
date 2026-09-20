@@ -151,4 +151,29 @@ if (!hits.includes("PL Zf 1") || !similar.includes("sa-sa-ra-me")) {
 }
 console.log(`smoke: word search OK — also on: ${hits}`);
 console.log(`smoke: similar forms: ${similar}`);
+
+// 3. The about page is prose injected as HTML, so hydration is the risk:
+// React would blow the content away on a mismatch. Check it survives.
+const aboutUrl = new URL("about/", URL_.split("?")[0]).href;
+await send("Page.navigate", { url: aboutUrl }, sessionId);
+await waitFor("!!document.querySelector('.prose h1')", "the about page");
+const about = await evaluate(
+  `(() => {
+     const h1 = document.querySelector('.prose h1');
+     return JSON.stringify({
+       heading: h1 ? h1.textContent : null,
+       sections: document.querySelectorAll('.prose h2').length,
+       tables: document.querySelectorAll('.prose table').length,
+       sources: document.querySelectorAll('.prose a[href^="https://"]').length,
+     });
+   })()`
+);
+const shape = JSON.parse(about);
+if (!shape.heading?.includes("Minoans") || shape.sections < 5 || shape.tables < 2) {
+  console.error(`smoke: FAILED — about page did not survive hydration: ${about}`);
+  cleanup(1);
+}
+console.log(
+  `smoke: about page OK — ${shape.sections} sections, ${shape.tables} tables, ${shape.sources} links`
+);
 cleanup(0);

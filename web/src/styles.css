@@ -545,3 +545,53 @@ button.linkish {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* --- the about page: prose converted from docs/who-were-the-minoans.md --- */
+.masthead .masthead-link {
+  margin-left: auto;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--accent);
+}
+.prose {
+  max-width: 44rem;
+}
+.prose h2 {
+  margin-top: 2.25rem;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.4rem 0.75rem 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.prose th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 400;
+}
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+}
+.prose hr {
+  margin: 2.5rem 0 1.5rem;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+.prose li {
+  margin-bottom: 0.4rem;
+}
+/* The sources list: long URLs must not push the page sideways on a phone. */
+.prose a {
+  overflow-wrap: anywhere;
+}

@@ -15,6 +15,7 @@ export function pageData(db: Db, route: string): PageData | null {
       featured: featuredTexts(db),
     };
   }
+  if (route === "/about/") return null; // built by aboutData; it needs no database
   const match = /^\/texts\/([^/]+)\/$/.exec(route);
   if (match) {
     const text = getTextPage(db, match[1]);
@@ -23,12 +24,18 @@ export function pageData(db: Db, route: string): PageData | null {
   return null;
 }
 
+/** The about page's data. `html` comes from the markdown, converted by the
+ *  prerender script, which is the only place that touches the filesystem. */
+export function aboutData(html: string): PageData {
+  return { route: "about", html };
+}
+
 export function render(data: PageData): string {
   return renderToString(<App data={data} />);
 }
 
 export function title(data: PageData): string {
-  return data.route === "home"
-    ? "The Ariana Project: Deciphering Linear A"
-    : `${data.text.id} — The Ariana Project`;
+  if (data.route === "home") return "The Ariana Project: Deciphering Linear A";
+  if (data.route === "about") return "Who were the Minoans? — The Ariana Project";
+  return `${data.text.id} — The Ariana Project`;
 }

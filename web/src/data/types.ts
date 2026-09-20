@@ -124,4 +124,14 @@ export interface TextData {
   text: TextPage;
 }
 
-export type PageData = HomeData | TextData;
+/**
+ * The about page is prose, not a query. It is authored once in
+ * docs/who-were-the-minoans.md and converted to HTML at prerender time, so
+ * the repository document and the published page cannot drift apart.
+ */
+export interface AboutData {
+  route: "about";
+  html: string;
+}
+
+export type PageData = HomeData | TextData | AboutData;

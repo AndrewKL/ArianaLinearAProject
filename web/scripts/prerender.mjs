@@ -24,6 +24,7 @@ if (!existsSync(DB)) {
 }
 
 const server = await import(join(web, "dist-ssr", "entry-server.js"));
+const { marked } = await import("marked");
 const { DatabaseSync } = await import("node:sqlite");
 
 const handle = new DatabaseSync(DB, { readOnly: true });
@@ -42,7 +43,7 @@ function routes() {
          ON r.inscription_id = i.id
       WHERE r.total >= 5 ORDER BY r.total DESC`
   );
-  return ["/", ...texts.map((t) => `/texts/${t.slug}/`)];
+  return ["/", "/about/", ...texts.map((t) => `/texts/${t.slug}/`)];
 }
 
 function write(route, html) {
@@ -52,8 +53,17 @@ function write(route, html) {
 }
 
 let count = 0;
+// The about page is prose, authored once in docs/ and rendered here so the
+// document and the published page cannot say different things.
+const ABOUT_MD = resolve(web, "..", "docs", "who-were-the-minoans.md");
+if (!existsSync(ABOUT_MD)) {
+  console.error(`missing ${ABOUT_MD}`);
+  process.exit(1);
+}
+const aboutHtml = marked.parse(readFileSync(ABOUT_MD, "utf8"), { async: false });
+
 for (const route of routes()) {
-  const data = server.pageData(db, route);
+  const data = route === "/about/" ? server.aboutData(aboutHtml) : server.pageData(db, route);
   if (!data) {
     console.warn(`no data for ${route}, skipped`);
     continue;
