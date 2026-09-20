@@ -1,0 +1,43 @@
+{
+  "source": {
+    "id": "linear-b-names",
+    "author": "compiled for this repository",
+    "title": "Place and personal names read through Linear B correspondence",
+    "kind": "compilation",
+    "notes": "Not a single publication. Linear B is read, and a number of Linear A words are spelled the same way as names known from the Linear B tablets; where the Linear A attestations sit in a position that fits a name, the identification is conventional. Each reading's `basis` gives the internal evidence, which can be checked here: python3 -m lineara word <form>. These are claims about the name, not about the language of Linear A: a Minoan place could keep its name into the Mycenaean period whatever language its inhabitants spoke. NOT INCLUDED: di-de-ru, sometimes matched with the Linear B personal name di-de-ro. In this corpus it occurs beside ku-ni-su in what read as cereal lists (HT 86a, HT 95b), which does not support a personal name, so no reading is recorded for it. Before citing any of these, go to the literature."
+  },
+  "readings": [
+    {
+      "form": "pa-i-to",
+      "gloss": "Phaistos (place name)",
+      "kind": "toponym",
+      "confidence": "widely-accepted",
+      "basis": "Spelled as Linear B pa-i-to, which is securely Phaistos. Both attestations are on Hagia Triada tablets, about 5 km from Phaistos, in list position among other entries.",
+      "notes": "The same spelling in a read script and an unread one is the strongest kind of evidence available here, but it identifies the name only."
+    },
+    {
+      "form": "se-to-i-ja",
+      "gloss": "Se-to-i-ja, a place named in the Linear B Knossos tablets",
+      "kind": "toponym",
+      "confidence": "widely-accepted",
+      "basis": "Spelled as Linear B se-to-i-ja. Its one attestation, PR Za 1 from Prassa, is a libation table carrying the formula (ta-na-su-te-ke se-to-i-ja a-sa-sa-*802-me), where a place name is expected.",
+      "notes": "Where Se-to-i-ja was is itself unsettled; the reading is that the word is that place, not where it lay."
+    },
+    {
+      "form": "su-ki-ri-ta",
+      "gloss": "Sybrita (place name)",
+      "kind": "toponym",
+      "confidence": "debated",
+      "basis": "Spelled as Linear B su-ki-ri-ta, usually identified with Sybrita in central Crete. Attested once, on the nodule PH Wa 32 from Phaistos, standing alone as a nodule label does.",
+      "notes": "Weaker than pa-i-to on two counts: the Linear B identification with Sybrita is itself an inference, and there is a single attestation. The near form su-ki-ra-ta also occurs once."
+    },
+    {
+      "form": "qa-qa-ru",
+      "gloss": "a personal name (?)",
+      "kind": "anthroponym",
+      "confidence": "debated",
+      "basis": "Spelled as Linear B qa-qa-ro, a personal name. All three attestations are Hagia Triada tablets, and in HT 118 and HT 122b it stands among other entries in a list closed by ku-ro, the position personal names are expected to occupy.",
+      "notes": "List position is consistent with a name but does not prove one; entries before ku-ro can also be commodities or places. Nothing here recovers who, if anyone, was meant."
+    }
+  ]
+}
