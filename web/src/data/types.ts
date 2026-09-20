@@ -134,4 +134,37 @@ export interface AboutData {
   html: string;
 }
 
-export type PageData = HomeData | TextData | AboutData;
+export type PageData = HomeData | TextData | AboutData | DatabaseSummary;
+
+/** One row of the database summary: a table and how much is in it. */
+export interface TableStat {
+  name: string;
+  rows: number;
+}
+
+/**
+ * What is actually in the shipped database. The site makes claims about
+ * coverage — "6% of word instances have a reading" — and those numbers go
+ * stale the moment a readings file changes. This page derives them, so they
+ * cannot drift.
+ */
+export interface DatabaseSummary {
+  route: "database";
+  upstreamCommit: string;
+  tables: TableStat[];
+  signsByCategory: { category: string; n: number; withValue: number }[];
+  inscriptionsByType: { type: string; n: number }[];
+  topSites: { site: string; n: number; located: number }[];
+  readingsBySource: { label: string; kind: string; readings: number; forms: number }[];
+  readingsByConfidence: { confidence: string; n: number }[];
+  coverage: {
+    wordInstances: number;
+    totalWordInstances: number;
+    forms: number;
+    totalForms: number;
+    faces: number;
+    totalFaces: number;
+  };
+  sites: { located: number; total: number; withArticle: number };
+  images: { files: number; faces: number };
+}

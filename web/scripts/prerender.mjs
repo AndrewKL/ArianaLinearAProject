@@ -43,7 +43,7 @@ function routes() {
          ON r.inscription_id = i.id
       WHERE r.total >= 5 ORDER BY r.total DESC`
   );
-  return ["/", "/about/", ...texts.map((t) => `/texts/${t.slug}/`)];
+  return ["/", "/about/", "/database/", ...texts.map((t) => `/texts/${t.slug}/`)];
 }
 
 function write(route, html) {

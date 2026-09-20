@@ -4,6 +4,7 @@
  */
 
 import type {
+  DatabaseSummary,
   Db,
   Featured,
   Image,
@@ -371,4 +372,96 @@ export function featuredTexts(db: Db, limit = 8) {
       site: r.site,
       translit: r.translit_text.split("\n")[0].slice(0, 80),
     }));
+}
+
+/** Tables the shipped database contains, in the order the page lists them. */
+const TABLES = [
+  "inscriptions",
+  "words",
+  "runs",
+  "signs",
+  "sign_occurrences",
+  "sites",
+  "readings",
+  "reading_forms",
+  "translations",
+  "sources",
+  "images",
+  "meta",
+] as const;
+
+/**
+ * Everything the database summary page shows, derived rather than written
+ * down. Counting rows needs the table name in the SQL, so the list above is a
+ * fixed constant — it never comes from a URL or a query string.
+ */
+export function getDatabaseSummary(db: Db): DatabaseSummary {
+  const one = (sql: string, params: unknown[] = []) =>
+    Number(db.all<{ n: number }>(sql, params)[0]?.n ?? 0);
+
+  const coverage = {
+    wordInstances: one(
+      `SELECT count(*) n FROM words w WHERE EXISTS
+         (SELECT 1 FROM reading_forms rf
+           WHERE instr(' ' || w.key || ' ', ' ' || rf.key || ' ') > 0)`
+    ),
+    totalWordInstances: one("SELECT count(*) n FROM words"),
+    forms: one(
+      `SELECT count(DISTINCT w.key) n FROM words w WHERE EXISTS
+         (SELECT 1 FROM reading_forms rf
+           WHERE instr(' ' || w.key || ' ', ' ' || rf.key || ' ') > 0)`
+    ),
+    totalForms: one("SELECT count(DISTINCT key) n FROM words"),
+    faces: one(
+      `SELECT count(DISTINCT w.inscription_id) n FROM words w WHERE EXISTS
+         (SELECT 1 FROM reading_forms rf
+           WHERE instr(' ' || w.key || ' ', ' ' || rf.key || ' ') > 0)`
+    ),
+    totalFaces: one("SELECT count(DISTINCT inscription_id) n FROM words"),
+  };
+
+  return {
+    route: "database",
+    upstreamCommit: String(
+      db.all<{ value: string }>("SELECT value FROM meta WHERE key='upstream_commit'")[0]?.value ?? ""
+    ).slice(0, 12),
+    tables: TABLES.map((name) => ({ name, rows: one(`SELECT count(*) n FROM ${name}`) })),
+    signsByCategory: db.all(
+      `SELECT coalesce(category, 'unclassified') category, count(*) n,
+              sum(CASE WHEN phonetic IS NOT NULL THEN 1 ELSE 0 END) withValue
+         FROM signs GROUP BY category ORDER BY n DESC`
+    ),
+    inscriptionsByType: db.all(
+      `SELECT coalesce(type, 'unrecorded') type, count(*) n
+         FROM inscriptions GROUP BY type ORDER BY n DESC LIMIT 10`
+    ),
+    topSites: db.all(
+      `SELECT i.site, count(*) n,
+              max(CASE WHEN s.lat IS NOT NULL THEN 1 ELSE 0 END) located
+         FROM inscriptions i LEFT JOIN sites s ON s.name = i.site
+        WHERE i.site IS NOT NULL GROUP BY i.site ORDER BY n DESC LIMIT 10`
+    ),
+    readingsBySource: db.all(
+      `SELECT coalesce(s.label, s.id) label, s.kind, count(*) readings,
+              count(DISTINCT r.key) forms
+         FROM readings r JOIN sources s ON s.id = r.source_id
+        GROUP BY s.id ORDER BY readings DESC`
+    ),
+    readingsByConfidence: db.all(
+      `SELECT confidence, count(*) n FROM readings
+        GROUP BY confidence
+        ORDER BY CASE confidence WHEN 'established' THEN 0 WHEN 'widely-accepted' THEN 1
+                                 WHEN 'debated' THEN 2 ELSE 3 END`
+    ),
+    coverage,
+    sites: {
+      located: one("SELECT count(*) n FROM sites WHERE lat IS NOT NULL"),
+      total: one("SELECT count(*) n FROM sites"),
+      withArticle: one("SELECT count(*) n FROM sites WHERE wikipedia IS NOT NULL"),
+    },
+    images: {
+      files: one("SELECT count(*) n FROM images"),
+      faces: one("SELECT count(DISTINCT inscription_id) n FROM images"),
+    },
+  };
 }

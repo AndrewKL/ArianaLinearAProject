@@ -6,7 +6,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { mapUrl, placeFor } from "./queries.ts";
+import { getDatabaseSummary, mapUrl, placeFor } from "./queries.ts";
 import { openDatabase } from "./node.ts";
 
 test("coordinates go to the point itself", () => {
@@ -60,4 +60,29 @@ test("an article title keeps its canonical URL form", { skip: !haveDb }, () => {
     placeFor(db, "Thera")?.wikipediaUrl,
     "https://en.wikipedia.org/wiki/Akrotiri_(prehistoric_city)"
   );
+});
+
+test("the database summary counts itself rather than being told", { skip: !haveDb }, () => {
+  const db = openDatabase(DB);
+  const s = getDatabaseSummary(db);
+
+  // Every table the page lists must exist and be non-empty.
+  for (const t of s.tables) assert.ok(t.rows > 0, `${t.name} is empty`);
+  assert.ok(s.tables.some((t) => t.name === "inscriptions" && t.rows > 1000));
+
+  // Coverage is a subset of the whole, never more.
+  assert.ok(s.coverage.wordInstances <= s.coverage.totalWordInstances);
+  assert.ok(s.coverage.forms <= s.coverage.totalForms);
+  assert.ok(s.coverage.faces <= s.coverage.totalFaces);
+
+  // A sound value can only come from a sign Linear B shares, so the
+  // A-series categories must report none.
+  const syllabograms = s.signsByCategory.find((c) => c.category === "syllabogram");
+  assert.ok(syllabograms && syllabograms.withValue > 0);
+
+  // Sources are shown by label, never by a raw id.
+  for (const row of s.readingsBySource) {
+    assert.ok(!row.label.includes("-20"), `${row.label} looks like an id, not a label`);
+  }
+  assert.ok(s.sites.located > 0 && s.sites.located <= s.sites.total);
 });

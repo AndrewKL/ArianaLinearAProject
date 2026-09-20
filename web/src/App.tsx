@@ -1,5 +1,6 @@
 import type { PageData } from "./data/types";
 import { About } from "./pages/About";
+import { Database } from "./pages/Database";
 import { Home } from "./pages/Home";
 import { Text } from "./pages/Text";
 
@@ -12,12 +13,17 @@ export function App({ data }: { data: PageData }) {
         <a className="masthead-link" href={`${import.meta.env.BASE_URL}about/`}>
           Who were the Minoans?
         </a>
+        <a className="masthead-link near" href={`${import.meta.env.BASE_URL}database/`}>
+          The data
+        </a>
       </header>
       <main>
         {data.route === "home" ? (
           <Home data={data} />
         ) : data.route === "about" ? (
           <About data={data} />
+        ) : data.route === "database" ? (
+          <Database data={data} />
         ) : (
           <Text data={data} />
         )}

@@ -584,3 +584,72 @@ button.linkish {
 .prose a {
   overflow-wrap: anywhere;
 }
+
+/* --- the database summary: plain tables of counts --- */
+.masthead .masthead-link.near {
+  margin-left: 0;
+}
+.db-tables {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+}
+.db-tables th,
+.db-tables td {
+  text-align: left;
+  padding: 0.35rem 0.75rem 0.35rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.db-tables th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 400;
+}
+.db-tables .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.db-tables .what {
+  color: var(--muted);
+}
+.two-up {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 2rem;
+}
+.unlocated {
+  color: var(--speculative);
+  cursor: help;
+}
+.stats .pct {
+  color: var(--muted);
+}
+.chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.chips .established {
+  color: var(--established);
+}
+.chips .speculative {
+  color: var(--speculative);
+}
+
+@media (max-width: 40rem) {
+  .two-up {
+    grid-template-columns: 1fr;
+  }
+}
