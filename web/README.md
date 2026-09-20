@@ -48,8 +48,9 @@ rewrite rules — and because the text should be readable without JavaScript.
   cannot pronounce Linear A, so that last one is an accessibility check.
 - `scripts/smoke.mjs` — drives headless Chrome over the DevTools protocol and
   checks that sqlite-wasm boots, the database inflates and a query returns
-  rows, and that the about page survives hydration. Node cannot exercise that path. Set `CHROME=` to point at a browser.
-  It loads `/?selftest`, which makes the page run its query on load.
+  rows, and that the about page survives hydration. Node cannot exercise
+  those paths. Set `CHROME=` to point at a browser. It loads `/?selftest`,
+  which makes the page run its query on load.
 
 ## Layout
 
