@@ -81,7 +81,7 @@ function Headline({ item }: { item: Featured }) {
             The paper is a <strong>{item.sourceKind}</strong> and has not been peer-reviewed.{" "}
           </>
         )}
-        Linear A is undeciphered, so this is one reading among others, not a settled translation.
+        It is one reading among others, not a settled translation.
       </p>
       <p className="actions">
         <a className="go" href={`${import.meta.env.BASE_URL}texts/${item.slug}/`}>
@@ -101,11 +101,11 @@ export function Home({ data }: { data: HomeData }) {
   const s = data.stats;
   return (
     <article>
-      <h1>The Linear A corpus</h1>
+      <h1>The Ariana Project: Deciphering Linear A</h1>
       <p className="lede">
-        Every inscribed face, its transliteration, and what anyone has proposed it means — with who
-        proposed it and how strong the claim is. Linear A is undeciphered: readings here are
-        proposals, never translations of record.
+        Every inscribed face of the corpus, transliterated sign by sign, beside every meaning
+        anyone has proposed for it — attributed to whoever proposed it, and rated for how far it
+        is accepted. The script is undeciphered; nothing here is a translation of record.
       </p>
 
       {data.headline && <Headline item={data.headline} />}

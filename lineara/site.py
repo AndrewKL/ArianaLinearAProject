@@ -150,7 +150,7 @@ CREATE INDEX images_inscription ON images(inscription_id);
             + "\nCREATE UNIQUE INDEX inscriptions_slug ON inscriptions(slug);\n" + images)
 
 
-TABLES = ["meta", "signs", "words", "runs", "sign_occurrences",
+TABLES = ["meta", "signs", "sites", "words", "runs", "sign_occurrences",
           "sources", "readings", "reading_forms", "translations"]
 
 

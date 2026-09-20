@@ -133,6 +133,74 @@ class ReadingsValidationTest(unittest.TestCase):
             self.load([{"form": "ku-vin", "gloss": "x", "kind": "k", "confidence": "debated"}])
 
 
+class GazetteerTest(unittest.TestCase):
+    """The findspot coordinates are curated, so the loader has to police them."""
+
+    HEADER = "site,label,region,lat,lon,precision,wikidata,note\n"
+
+    def setUp(self):
+        self.conn = sqlite3.connect(":memory:")
+        self.conn.executescript(builder.SCHEMA)
+        self.conn.execute("INSERT INTO inscriptions (id, site) VALUES ('IO Za 2', 'Iouktas')")
+        self.dir = tempfile.TemporaryDirectory()
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def load(self, body):
+        path = Path(self.dir.name, "sites.csv")
+        path.write_text(self.HEADER + body, encoding="utf-8")
+        notes = []
+        n = builder.load_sites(self.conn, path, warn=notes.append)
+        return n, notes
+
+    def test_loads_a_located_site(self):
+        n, notes = self.load("Iouktas,Mount Juktas,Crete,35.2467,25.1556,site,Q1349103,\n")
+        self.assertEqual((n, notes), (1, []))
+        row = self.conn.execute(
+            "SELECT label, region, lat, lon, precision, wikidata FROM sites").fetchone()
+        self.assertEqual(row[:3], ("Mount Juktas", "Crete", 35.2467))
+        self.assertEqual(row[4:], ("site", "Q1349103"))
+
+    def test_a_site_may_have_no_coordinates(self):
+        n, _ = self.load("Iouktas,Mount Juktas,Crete,,,,,not located\n")
+        self.assertEqual(n, 1)
+        self.assertEqual(
+            self.conn.execute("SELECT lat, lon, precision FROM sites").fetchone(),
+            (None, None, None))
+
+    def test_rejects_half_a_coordinate(self):
+        with self.assertRaises(SystemExit):
+            self.load("Iouktas,Mount Juktas,Crete,35.2467,,site,,\n")
+
+    def test_rejects_unknown_precision(self):
+        with self.assertRaises(SystemExit):
+            self.load("Iouktas,Mount Juktas,Crete,35.2467,25.1556,exact,,\n")
+
+    def test_rejects_a_duplicate_site(self):
+        with self.assertRaises(SystemExit):
+            self.load("Iouktas,Mount Juktas,Crete,,,,,\nIouktas,Juktas,Crete,,,,,\n")
+
+    def test_warns_about_both_directions_of_mismatch(self):
+        _, notes = self.load("Atlantis,Atlantis,,,,,,\n")
+        self.assertTrue(any("not a site in the corpus" in note for note in notes))
+        self.assertTrue(any("Iouktas" in note for note in notes))
+
+    def test_the_repository_gazetteer_covers_the_corpus(self):
+        """The shipped file must name every site the corpus uses, located or not."""
+        if not builder.DB_PATH.exists():
+            self.skipTest("no database; run python3 -m lineara build")
+        conn = sqlite3.connect(str(builder.DB_PATH))
+        try:
+            missing = conn.execute(
+                """SELECT DISTINCT i.site FROM inscriptions i
+                    LEFT JOIN sites s ON s.name = i.site
+                    WHERE i.site IS NOT NULL AND s.name IS NULL""").fetchall()
+        finally:
+            conn.close()
+        self.assertEqual(missing, [])
+
+
 class SlugTest(unittest.TestCase):
     def test_plain_ids(self):
         self.assertEqual(site.slugify("IO Za 2"), "io-za-2")

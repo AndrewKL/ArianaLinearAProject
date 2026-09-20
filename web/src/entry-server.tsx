@@ -29,6 +29,6 @@ export function render(data: PageData): string {
 
 export function title(data: PageData): string {
   return data.route === "home"
-    ? "Linear A corpus"
-    : `${data.text.id} — Linear A corpus`;
+    ? "The Ariana Project: Deciphering Linear A"
+    : `${data.text.id} — The Ariana Project`;
 }

@@ -1,5 +1,6 @@
 """Build lineara.db from the pinned upstream corpus plus the readings/*.json files."""
 
+import csv
 import json
 import sqlite3
 from pathlib import Path
@@ -10,8 +11,12 @@ from .signs import SignTable, key_len
 ROOT = upstream.ROOT
 DB_PATH = ROOT / "lineara.db"
 READINGS_DIR = ROOT / "readings"
+SITES_CSV = ROOT / "data" / "sites.csv"
 
 CONFIDENCE = ("established", "widely-accepted", "debated", "speculative")
+# What a site's point marks: the excavated site, the settlement it lies in, or
+# only the island or region. Shown to the reader, never silently rounded off.
+PRECISION = ("site", "locality", "region")
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
@@ -42,6 +47,18 @@ CREATE TABLE inscriptions (
     sources TEXT,                 -- JSON list of upstream sources
     conflicts TEXT,               -- JSON: unresolved rival values upstream
     raw TEXT                      -- the full upstream record, JSON
+);
+
+-- Where the objects were found. The corpus names a site but gives no
+-- position, so these coordinates are curated here: see data/sites.csv.
+CREATE TABLE sites (
+    name TEXT PRIMARY KEY,        -- exactly as inscriptions.site
+    label TEXT,                   -- display name, the usual English one
+    region TEXT,                  -- Crete, Cyclades, Peloponnese ...
+    lat REAL, lon REAL,           -- null where no position is recorded
+    precision TEXT,               -- site | locality | region
+    wikidata TEXT,                -- the Q-id the position was taken from
+    note TEXT
 );
 
 -- Editorial word divisions, as the upstream source gives them.
@@ -175,6 +192,53 @@ def load_corpus(conn, corpus, signs):
                           None if s.get("certain") is None else int(bool(s["certain"]))))
 
 
+def load_sites(conn, path=SITES_CSV, warn=print):
+    """Load the curated findspot gazetteer.
+
+    The upstream corpus names a site ('Iouktas') and sometimes a findspot
+    within it ('Portico 11 and Room 13'), but never a position. data/sites.csv
+    supplies one per site name, each cited to the Wikidata item it came from,
+    with `precision` saying what the point actually marks. Rows with no
+    coordinates are still loaded: the site keeps its display name and region,
+    and the website falls back to a search by name.
+    """
+    if not Path(path).exists():
+        warn("no gazetteer at %s; sites will have no coordinates" % path)
+        return 0
+    used = {row[0] for row in conn.execute(
+        "SELECT DISTINCT site FROM inscriptions WHERE site IS NOT NULL")}
+    seen, n = set(), 0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            name = (row.get("site") or "").strip()
+            if not name or name.startswith("#"):
+                continue
+            if name in seen:
+                raise SystemExit("%s: duplicate site %r" % (path, name))
+            seen.add(name)
+            if name not in used:
+                warn("%s: %r is not a site in the corpus" % (path, name))
+            lat, lon = (row.get("lat") or "").strip(), (row.get("lon") or "").strip()
+            precision = (row.get("precision") or "").strip() or None
+            if (lat == "") != (lon == ""):
+                raise SystemExit("%s: %r has only one of lat/lon" % (path, name))
+            if lat and precision not in PRECISION:
+                raise SystemExit("%s: %r has precision %r, expected one of %s"
+                                 % (path, name, precision, ", ".join(PRECISION)))
+            conn.execute("INSERT INTO sites VALUES (?,?,?,?,?,?,?,?)", (
+                name, (row.get("label") or "").strip() or name,
+                (row.get("region") or "").strip() or None,
+                float(lat) if lat else None, float(lon) if lon else None,
+                precision if lat else None,
+                (row.get("wikidata") or "").strip() or None,
+                (row.get("note") or "").strip() or None))
+            n += 1
+    missing = sorted(used - seen)
+    if missing:
+        warn("%s: no entry for %d corpus site(s): %s" % (path, len(missing), ", ".join(missing)))
+    return n
+
+
 def load_readings(conn, signs, readings_dir=READINGS_DIR, warn=print):
     known_ids = {row[0] for row in conn.execute("SELECT id FROM inscriptions")}
     attested = {row[0] for row in conn.execute("SELECT DISTINCT key FROM attestations")}
@@ -250,6 +314,7 @@ def build(db_path=DB_PATH, log=print):
             ("upstream_commit", upstream.COMMIT),
         ])
         load_corpus(conn, corpus, signs)
+        load_sites(conn, warn=log)
         n = load_readings(conn, signs, warn=log)
         conn.commit()
     finally:

@@ -237,6 +237,42 @@ text page have at least one image**, 79 MB in total.
   needs `PUBLISH_ALLOWED`, and neither should be set without EFA permission. 1,042 images cover 537 of the 554
   faces that get a full page.
 
+### Findspots: the site name is a map link
+
+The corpus names a site for 1,821 of the 1,884 faces (`Haghia Triada`,
+`Iouktas`, …, 54 distinct names) and sometimes a findspot inside it
+(`Portico 11 and Room 13`), but **it records no coordinates**. So the position
+is curated here, in `data/sites.csv`, one row per site name exactly as the
+corpus spells it:
+
+```csv
+site,label,region,lat,lon,precision,wikidata,note
+Iouktas,Mount Juktas,Crete,35.23994,25.14414,locality,Q3321879,the peak sanctuary is at the summit; this is the mountain
+Petras,"Petras, Siteia",Crete,,,,,no Wikidata item found with coordinates
+```
+
+Three decisions hold this together:
+
+- **Every coordinate cites where it came from.** Each is the `P625` value of
+  the named Wikidata item, resolved once by a script and then audited by
+  hand — the automated first pass matched *Troy* to a university in Alabama
+  and *Sitia* to a geopark, so nothing lands in the file unreviewed. 41 of
+  the 54 sites are located, covering 1,791 of the 1,821 faces that name one.
+- **`precision` is shown, not rounded away.** A point is the excavated `site`
+  (Knossos, Zakros), the `locality` it lies in (Malia town is 3 km from the
+  palace; Mount Juktas is the mountain, not the summit sanctuary), or only a
+  `region` (Samothrace, Margiana). The map link says which in its title and
+  to a screen reader.
+- **No coordinates means no pin.** The other 13 sites link to a Google Maps
+  *search* for the name and region instead, which claims nothing. A
+  half-remembered point would be worse than an honest search.
+
+The file is a CSV so it can be corrected by anyone who knows a site better
+than Wikidata does — that is the expected way it improves. `load_sites`
+rejects a row with half a coordinate, an unknown `precision` or a duplicate
+name, and warns in both directions when the file and the corpus disagree
+about which sites exist.
+
 ## Typography and the three token types
 
 The transliteration layer must not make everything look like a spoken word.

@@ -6,7 +6,7 @@ export function App({ data }: { data: PageData }) {
   return (
     <>
       <header className="masthead">
-        <a href={import.meta.env.BASE_URL}>Linear A corpus</a>
+        <a href={import.meta.env.BASE_URL}>The Ariana Project</a>
         <span className="masthead-note">undeciphered · readings are proposals, not translations</span>
       </header>
       <main>{data.route === "home" ? <Home data={data} /> : <Text data={data} />}</main>

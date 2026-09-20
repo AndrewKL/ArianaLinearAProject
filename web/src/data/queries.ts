@@ -3,7 +3,18 @@
  * is on sign-id keys, so pasted Unicode and typed transliteration agree.
  */
 
-import type { Db, Featured, Image, Reading, Stats, TextPage, Token, Translation, Word } from "./types";
+import type {
+  Db,
+  Featured,
+  Image,
+  Place,
+  Reading,
+  Stats,
+  TextPage,
+  Token,
+  Translation,
+  Word,
+} from "./types";
 
 /** Unassigned code points that lineara.xyz uses; never emit them as characters. */
 const DAMAGE_MARK = "\u{1076B}";
@@ -264,6 +275,43 @@ function imagesFor(db: Db, id: string): Image[] {
     }));
 }
 
+/**
+ * A Google Maps link for a findspot. With coordinates the query is the point
+ * itself, so the pin is where the gazetteer says and nowhere else; without
+ * them it is a search by name, which is honest about knowing only the name.
+ */
+export function mapUrl(place: {
+  label: string;
+  region: string | null;
+  lat: number | null;
+  lon: number | null;
+}): string {
+  const query =
+    place.lat !== null && place.lon !== null
+      ? `${place.lat},${place.lon}`
+      : [place.label, place.region].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+export function placeFor(db: Db, site: string | null): Place | null {
+  if (!site) return null;
+  const row = db.all<Record<string, any>>(
+    `SELECT name, label, region, lat, lon, precision, wikidata FROM sites WHERE name = ?`,
+    [site]
+  )[0];
+  if (!row) return null;
+  const place = {
+    name: row.name,
+    label: row.label ?? row.name,
+    region: row.region ?? null,
+    lat: row.lat ?? null,
+    lon: row.lon ?? null,
+    precision: row.precision ?? null,
+    wikidata: row.wikidata ?? null,
+  };
+  return { ...place, mapUrl: mapUrl(place) };
+}
+
 export function getTextPage(db: Db, slug: string): TextPage | null {
   const row = db.all<Record<string, any>>(
     `SELECT id, slug, site, type, period, gorila_ref, museum_inventory, unicode_text, translit_text
@@ -276,6 +324,7 @@ export function getTextPage(db: Db, slug: string): TextPage | null {
     id: row.id,
     slug: row.slug,
     site: row.site,
+    place: placeFor(db, row.site),
     type: row.type,
     period: row.period,
     refs: { gorila: row.gorila_ref, museum: row.museum_inventory },

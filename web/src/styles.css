@@ -503,3 +503,27 @@ button.linkish {
 .word-form {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
+
+/* --- findspot: the site name is a map link, quietly marked --- */
+.findspot {
+  color: inherit;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 2px;
+}
+.findspot:hover {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+/* Text for screen readers only: the map link's precision caveat, which sighted
+   readers get from the title attribute. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

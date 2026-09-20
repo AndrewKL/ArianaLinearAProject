@@ -42,10 +42,28 @@ export interface Word {
   readings: Reading[];
 }
 
+/**
+ * Where a text was found. The corpus names a site but records no position,
+ * so this comes from the curated gazetteer in data/sites.csv. `precision`
+ * says what the point marks, and is shown rather than rounded away: a peak
+ * sanctuary is a site, a findspot known only as "Crete" is a region.
+ */
+export interface Place {
+  name: string;
+  label: string;
+  region: string | null;
+  lat: number | null;
+  lon: number | null;
+  precision: "site" | "locality" | "region" | null;
+  wikidata: string | null;
+  mapUrl: string;
+}
+
 export interface TextPage {
   id: string;
   slug: string;
   site: string | null;
+  place: Place | null;
   type: string | null;
   period: string | null;
   refs: { gorila: string | null; museum: string | null };

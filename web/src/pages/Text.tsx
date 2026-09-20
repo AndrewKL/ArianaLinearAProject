@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import type { WordReport } from "../data/explore";
-import type { Image, Reading, TextData, Token, Word } from "../data/types";
+import type { Image, Place, Reading, TextData, Token, Word } from "../data/types";
 
 const CONFIDENCE_BARS: Record<Reading["confidence"], string> = {
   established: "▰▰▰▰",
@@ -268,6 +268,32 @@ function Plates({ images, id }: { images: Image[]; id: string }) {
   );
 }
 
+/**
+ * The findspot, linked to a map. What the pin marks varies — a peak
+ * sanctuary is a point, "Crete" is an island — so the precision is stated
+ * rather than left for the reader to assume from the zoom level. With no
+ * coordinates the link is a search by name, which claims nothing.
+ */
+const PRECISION_NOTE: Record<NonNullable<Place["precision"]>, string> = {
+  site: "the excavated site",
+  locality: "the place it lies in, not the excavation itself",
+  region: "only the region is recorded",
+};
+
+function Findspot({ place, fallback }: { place: Place | null; fallback: string | null }) {
+  if (!place) return <>{fallback ?? "findspot not recorded"}</>;
+  const note = place.precision
+    ? PRECISION_NOTE[place.precision]
+    : "no coordinates recorded; this searches by name";
+  return (
+    <a className="findspot" href={place.mapUrl} rel="noopener" title={`Google Maps — ${note}`}>
+      {place.label}
+      <span aria-hidden="true"> ⌖</span>
+      <span className="visually-hidden"> — on Google Maps, {note}</span>
+    </a>
+  );
+}
+
 export function Text({ data }: { data: TextData }) {
   const t = data.text;
   const refs = [t.refs.gorila && `GORILA ${t.refs.gorila}`, t.refs.museum].filter(Boolean);
@@ -275,7 +301,8 @@ export function Text({ data }: { data: TextData }) {
     <article>
       <h1>{t.id}</h1>
       <p className="meta">
-        {[t.site, t.type?.replace("_", " "), t.period].filter(Boolean).join(" · ")}
+        <Findspot place={t.place} fallback={t.site} />
+        {[t.type?.replace("_", " "), t.period].filter(Boolean).map((part) => ` · ${part}`)}
         {refs.length > 0 && <span className="refs"> — {refs.join(" · ")}</span>}
       </p>
 
