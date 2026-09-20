@@ -242,6 +242,57 @@ class ImageNameTest(unittest.TestCase):
         self.assertIn(images.COMMIT, url)
 
 
+class AbsentImageCacheTest(unittest.TestCase):
+    """Most candidate image names do not exist upstream. We must ask only once."""
+
+    def setUp(self):
+        from lineara import images
+        self.images = images
+        self.dir = tempfile.TemporaryDirectory()
+        self.path = Path(self.dir.name, "images-absent.json")
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def test_round_trips_the_names(self):
+        self.images.save_absent({"b.jpg", "a.jpg"}, self.path, "deadbeef")
+        self.assertEqual(self.images.load_absent(self.path, "deadbeef"), {"a.jpg", "b.jpg"})
+
+    def test_a_different_pin_invalidates_the_cache(self):
+        """A name absent at one commit says nothing about another."""
+        self.images.save_absent({"a.jpg"}, self.path, "deadbeef")
+        self.assertEqual(self.images.load_absent(self.path, "cafe1234"), set())
+
+    def test_a_missing_or_corrupt_file_is_not_fatal(self):
+        self.assertEqual(self.images.load_absent(self.path, "deadbeef"), set())
+        self.path.write_text("{not json", encoding="utf-8")
+        self.assertEqual(self.images.load_absent(self.path, "deadbeef"), set())
+
+    def test_known_absent_names_are_never_requested_again(self):
+        images = self.images
+        asked = []
+
+        def fake_download(name, dest, force):
+            asked.append(name)
+            return "missing" if name.endswith(".png") else "new"
+
+        original_download, original_wanted = images._download, images.wanted
+        images._download = fake_download
+        images.wanted = lambda *_a, **_k: ["IOZa2"]
+        try:
+            dest = Path(self.dir.name, "img")
+            images.fetch(dest=dest, log=lambda _m: None, absent_path=self.path)
+            first = len(asked)
+            self.assertEqual(first, 4)  # two stems, two suffixes
+
+            asked.clear()
+            images.fetch(dest=dest, log=lambda _m: None, absent_path=self.path)
+            # The two .png names 404'd, so only the two .jpg names are asked again.
+            self.assertEqual(sorted(asked), ["IOZa2-Facsimile.jpg", "IOZa2-Inscription.jpg"])
+        finally:
+            images._download, images.wanted = original_download, original_wanted
+
+
 @unittest.skipUnless(builder.DB_PATH.exists(), "run `python3 -m lineara build` first")
 class CorpusTest(unittest.TestCase):
     """Checks against the built database."""

@@ -28,6 +28,20 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Upstream data is pinned by commit, so it never changes under a given
+      # key: cache it rather than re-downloading it, and the inscription
+      # images in particular (about 80 MB, a thousand requests) on every push.
+      - name: Read the upstream pins
+        id: pins
+        run: |
+          echo "corpus=$(python3 -c 'from lineara import fetch; print(fetch.COMMIT[:12])')" >> "$GITHUB_OUTPUT"
+          echo "images=$(python3 -c 'from lineara import images; print(images.COMMIT[:12])')" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: data/upstream
+          key: upstream-${{ steps.pins.outputs.corpus }}-${{ steps.pins.outputs.images }}
+
       - name: Build the corpus database
         run: python3 -m lineara build
 
@@ -70,7 +84,7 @@ jobs:
         run: |
           mkdir -p serve/${{ github.event.repository.name }}
           cp -R dist/. serve/${{ github.event.repository.name }}/
-          npx --yes http-server serve -p 4173 --silent &
+          npx http-server serve -p 4173 --silent &
           for i in $(seq 1 20); do
             curl -sf -o /dev/null "http://localhost:4173/${{ github.event.repository.name }}/" && break
             sleep 1

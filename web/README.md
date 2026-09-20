@@ -90,6 +90,12 @@ full page. They land in gitignored `data/upstream/lineara-images/`, and
 `site data` copies them into `public/img/` and records each one's kind,
 dimensions and credit.
 
+It is polite about it. A file already on disk is not re-requested, and the
+names that do not exist upstream are recorded in committed
+`data/images-absent.json`, so they are not requested twice — a warm run makes
+no network requests at all, and CI caches `data/upstream/` keyed on the two
+pinned commits. Use `--force` to re-probe.
+
 They are GORILA plate material, © École Française d'Athènes. Downloading them
 for local work is fine. **Publishing them is redistribution and needs the
 EFA's permission**, which is why CI downloads them only when the repository
