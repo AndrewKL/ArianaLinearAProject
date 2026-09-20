@@ -35,6 +35,8 @@ export interface Word {
   i: number;
   key: string;
   form: string;
+  /** The word in Linear A characters; "" where no sign has a glyph. */
+  glyphs: string;
   layer: "editorial" | "mechanical";
   attest: { texts: number; sites: number };
   readings: Reading[];

@@ -170,7 +170,12 @@ function WordEntry({ word, here }: { word: Word; here: string }) {
           <span className="caret" aria-hidden="true">
             {open ? "▾" : "▸"}
           </span>
-          {word.form}
+          {word.glyphs && (
+            <span className="word-glyphs" aria-hidden="true">
+              {word.glyphs}
+            </span>
+          )}
+          <span className="word-form">{word.form}</span>
         </button>
         <span className="attest">
           {word.attest.texts === 1

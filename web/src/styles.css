@@ -491,3 +491,15 @@ button.linkish {
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   }
 }
+
+/* The word in Linear A beside its value. aria-hidden: the transliteration
+   is what a screen reader can actually pronounce. */
+.word-glyphs {
+  font-family: "Linear A", "Noto Sans Linear A", serif;
+  font-size: 1.45rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+.word-form {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}

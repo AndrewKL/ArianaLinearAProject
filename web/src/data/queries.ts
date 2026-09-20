@@ -155,6 +155,7 @@ function wordsFor(db: Db, id: string): { words: Word[]; layer: "editorial" | "me
       i: row.pos,
       key: row.key,
       form: displayForm(db, row.key),
+      glyphs: glyphsFor(db, row.key),
       layer,
       attest: { texts: Number(spread.texts), sites: Number(spread.sites) },
       readings: readingsFor(db, row.key),
@@ -163,15 +164,39 @@ function wordsFor(db: Db, id: string): { words: Word[]; layer: "editorial" | "me
   return { words, layer };
 }
 
+let signLookup: Map<string, { translit: string; glyph: string | null }> | null = null;
+
+function signTable(db: Db) {
+  if (!signLookup) {
+    signLookup = new Map(
+      db
+        .all<{ id: string; translit: string; glyph: string | null }>(
+          "SELECT id, translit, glyph FROM signs"
+        )
+        .map((row) => [row.id, { translit: row.translit, glyph: row.glyph }])
+    );
+  }
+  return signLookup;
+}
+
 /** Key -> lowercase transliteration, the convention used on the site. */
 export function displayForm(db: Db, key: string): string {
-  const parts = key.split(" ").map((sid) => {
-    if (sid === "?") return "[?]";
-    if (sid.startsWith("x:")) return sid.slice(2);
-    const row = db.all<{ translit: string }>("SELECT translit FROM signs WHERE id = ?", [sid])[0];
-    return row ? row.translit : sid;
-  });
-  return parts.join("-");
+  const lookup = signTable(db);
+  return key
+    .split(" ")
+    .map((sid) =>
+      sid === "?" ? "[?]" : sid.startsWith("x:") ? sid.slice(2) : lookup.get(sid)?.translit ?? sid
+    )
+    .join("-");
+}
+
+/** Key -> the word in Linear A characters, skipping signs Unicode does not encode. */
+export function glyphsFor(db: Db, key: string): string {
+  const lookup = signTable(db);
+  return key
+    .split(" ")
+    .map((sid) => lookup.get(sid)?.glyph ?? "")
+    .join("");
 }
 
 const TRANSLATION_COLUMNS = `t.text, t.notes, t.source_id, s.author, s.year, s.title,
