@@ -504,14 +504,17 @@ button.linkish {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-/* --- findspot: the site name is a map link, quietly marked --- */
+/* --- findspot: the site name is a map link, and reads as one. The rest of
+   the meta line is muted, so the accent colour carries the affordance; the
+   ⌖ marks it for anyone who cannot tell the two colours apart. --- */
 .findspot {
-  color: inherit;
-  text-decoration-color: var(--rule);
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
   text-underline-offset: 2px;
 }
-.findspot:hover {
-  color: var(--accent);
+.findspot:hover,
+.findspot:focus-visible {
   text-decoration-color: currentColor;
 }
 
