@@ -40,5 +40,24 @@ test("every findspot in the corpus resolves to a place", { skip: !haveDb }, () =
     assert.ok(place.mapUrl.startsWith("https://www.google.com/maps/"), site);
     // A point must declare what it marks; a nameless search must not pretend to.
     assert.equal(place.lat === null, place.precision === null, site);
+    // An article link only exists where an item was cited for the position,
+    // so the two can never describe different places.
+    if (place.wikipediaUrl) {
+      assert.ok(place.wikidata, `${site} links an article with no item behind it`);
+      assert.ok(place.wikipediaUrl.startsWith("https://en.wikipedia.org/wiki/"), site);
+      assert.ok(!place.wikipediaUrl.includes(" "), `${site} has an unescaped space`);
+    }
   }
+});
+
+test("an article title keeps its canonical URL form", { skip: !haveDb }, () => {
+  const db = openDatabase(DB);
+  assert.equal(
+    placeFor(db, "Mallia")?.wikipediaUrl,
+    "https://en.wikipedia.org/wiki/Malia,_Crete"
+  );
+  assert.equal(
+    placeFor(db, "Thera")?.wikipediaUrl,
+    "https://en.wikipedia.org/wiki/Akrotiri_(prehistoric_city)"
+  );
 });

@@ -246,9 +246,9 @@ is curated here, in `data/sites.csv`, one row per site name exactly as the
 corpus spells it:
 
 ```csv
-site,label,region,lat,lon,precision,wikidata,note
-Iouktas,Mount Juktas,Crete,35.23994,25.14414,locality,Q3321879,the peak sanctuary is at the summit; this is the mountain
-Petras,"Petras, Siteia",Crete,,,,,no Wikidata item found with coordinates
+site,label,region,lat,lon,precision,wikidata,wikipedia,note
+Iouktas,Mount Juktas,Crete,35.23994,25.14414,locality,Q3321879,Mount Juktas,the peak sanctuary is at the summit; this is the mountain
+Petras,"Petras, Siteia",Crete,,,,,,no Wikidata item found with coordinates
 ```
 
 Three decisions hold this together:
@@ -266,6 +266,11 @@ Three decisions hold this together:
 - **No coordinates means no pin.** The other 13 sites link to a Google Maps
   *search* for the name and region instead, which claims nothing. A
   half-remembered point would be worse than an honest search.
+
+Where the cited item has an English Wikipedia article — 34 of the 41 — the
+site name carries a second, quieter `wiki` link beside the map one. Both come
+from the same Wikidata item, so they can never describe different places, and
+a site with no located item gets neither.
 
 The file is a CSV so it can be corrected by anyone who knows a site better
 than Wikidata does — that is the expected way it improves. `load_sites`

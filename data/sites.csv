@@ -1,55 +1,55 @@
-site,label,region,lat,lon,precision,wikidata,note
-Apodoulou,Apodoulou,Crete,35.15583,24.73528,locality,Q15720002,
-Arkalochori,Arkalochori,Crete,35.15000,25.26667,locality,Q2283009,the cave lies near the town
-Arkhalkhori,Arkalochori,Crete,35.15000,25.26667,locality,Q2283009,the corpus spells Arkalochori both ways
-Arkhanes,Archanes,Crete,35.23667,25.16361,locality,Q632418,
-Armenoi,Armenoi cemetery,Crete,35.31806,24.46278,site,Q1573075,
-Crete,Crete,,,,,,findspot recorded only as the island
-Gournia,Gournia,Crete,35.10917,25.79250,site,Q1540236,
-Haghia Triada,Hagia Triada,Crete,35.05917,24.79278,site,Q393632,
-Haghios Stephanos,"Ayios Stephanos, Laconia",Peloponnese,,,,,no Wikidata item found with coordinates
-Iouktas,Mount Juktas,Crete,35.23994,25.14414,locality,Q3321879,the peak sanctuary is at the summit; this is the mountain
-Kalo Chorafi,Kalo Chorafi,Crete,35.40695,24.84919,locality,Q21747337,
-Kamilari,Kamilari,Crete,35.03389,24.78944,locality,Q992221,the tholos tomb is outside the village
-Kannia,"Kannia, Gortyn",Crete,,,,,Wikidata item Q6364064 has no coordinates
-Kardamoutsa,Kardamoutsa,Crete,,,,,only a monastery of the name is on Wikidata; the link is unconfirmed
-Kea,"Ayia Irini, Kea",Cyclades,37.66889,24.32583,site,Q393550,
-Khania,Chania,Crete,35.51667,24.01667,locality,Q182299,Minoan Kydonia lies under the Kastelli hill in the old town
-Knossos,Knossos,Crete,35.29796,25.16316,site,Q173527,
-Kophinas,Mount Kophinas,Crete,,,,,"Wikidata has the municipal unit, not the mountain sanctuary"
-Kythera,"Kastri, Kythera",Kythera,,,,,no Wikidata item found for the Minoan site at Kastri
-Larani,Larani,Crete,35.10528,25.06639,locality,Q12880102,
-Mallia,Malia,Crete,35.28361,25.46250,locality,Q284463,the palace is about 3 km east of the modern town
-Margiana,Margiana,Central Asia,37.66333,62.17639,region,Q154974,the attribution of this find to Linear A is disputed
-Melos,"Phylakopi, Melos",Cyclades,36.75498,24.50458,site,Q1447360,
-Miletos,Miletus,Anatolia,37.53111,27.27556,site,Q169460,
-Mochlos,Mochlos,Crete,35.18444,25.90444,locality,Q992326,the excavated site is the islet offshore from the village
-Mycenae,Mycenae,Peloponnese,37.73083,22.75611,site,Q132564,
-Nerokourou,Nerokourou,Crete,35.47583,24.03833,locality,Q12249495,
-Palaikastro,Palaikastro,Crete,35.19778,26.25472,locality,Q941860,the Minoan town at Roussolakkos is about 2 km east of the village
-Papoura,Papoura,Crete,,,,,several Cretan places carry the name; none confirmed
-Petras,"Petras, Siteia",Crete,,,,,no Wikidata item found with coordinates
-Phaistos,Phaistos,Crete,35.05123,24.81427,site,Q249707,
-Phourni,"Phourni, Archanes",Crete,35.24611,25.15861,site,Q1440052,
-Platanos,"Platanos, Mesara",Crete,,,,,no Wikidata item found for the Mesara tholos site
-Poros Herakleiou,"Poros-Katsambas, Heraklion",Crete,35.34116,25.15283,site,Q104830751,
-Prassa,Prassa,Crete,35.30690,25.19180,site,Q7238563,
-Psykhro,Psychro Cave,Crete,35.16286,25.44506,site,Q1643807,
-Pyrgos,Myrtos Pyrgos,Crete,35.00694,25.59056,site,Q2010377,
-Samothrace,Samothrace,North Aegean,40.45000,25.58750,region,Q203175,the find is from Mikro Vouni; this is the island
-Selakanos,Selakano,Crete,35.09230,25.54263,locality,Q7447449,
-Sitia,Sitia,Crete,35.20769,26.10690,locality,Q985549,
-Skhinia,Skhinia,Crete,,,,,no Wikidata item found
-Skoteino Cave,Skoteino Cave,Crete,35.30484,25.29767,site,Q7536414,
-Syme,Kato Syme,Crete,35.04700,25.48900,locality,Q6377757,the sanctuary lies above the village
-Tel Haror,Tel Haror,Negev,31.38210,34.60650,site,Q770842,
-Thera,"Akrotiri, Thera",Cyclades,36.35136,25.40356,site,Q421232,
-Tiryns,Tiryns,Peloponnese,37.59944,22.79972,site,Q217379,
-Traostalos,Traostalos,Crete,35.12639,26.26722,site,Q4462172,
-Troullos,Troullos,Crete,,,,,several places carry the name; none confirmed
-Troy,Troy (Hisarlik),Anatolia,,,,,no Wikidata item found with coordinates
-Trypiti,Trypiti,Crete,,,,,the Cretan Trypiti is not on Wikidata; other places of the name are
-Tylissos,Tylissos,Crete,35.29856,25.02044,site,Q38280988,
-Vrysinas,Mount Vrysinas,Crete,35.31180,24.49660,locality,Q7943207,peak sanctuary at the summit
-Zakros,Kato Zakros,Crete,35.09806,26.26139,site,Q60218,
-Zominthos,Zominthos,Crete,35.24869,24.88714,site,Q219818,
+site,label,region,lat,lon,precision,wikidata,wikipedia,note
+Apodoulou,Apodoulou,Crete,35.15583,24.73528,locality,Q15720002,,
+Arkalochori,Arkalochori,Crete,35.15000,25.26667,locality,Q2283009,Arkalochori,the cave lies near the town
+Arkhalkhori,Arkalochori,Crete,35.15000,25.26667,locality,Q2283009,Arkalochori,the corpus spells Arkalochori both ways
+Arkhanes,Archanes,Crete,35.23667,25.16361,locality,Q632418,Archanes,
+Armenoi,Armenoi cemetery,Crete,35.31806,24.46278,site,Q1573075,Armenoi (archaeological site),
+Crete,Crete,,,,,,,findspot recorded only as the island
+Gournia,Gournia,Crete,35.10917,25.79250,site,Q1540236,Gournia,
+Haghia Triada,Hagia Triada,Crete,35.05917,24.79278,site,Q393632,Hagia Triada,
+Haghios Stephanos,"Ayios Stephanos, Laconia",Peloponnese,,,,,,no Wikidata item found with coordinates
+Iouktas,Mount Juktas,Crete,35.23994,25.14414,locality,Q3321879,Mount Juktas,the peak sanctuary is at the summit; this is the mountain
+Kalo Chorafi,Kalo Chorafi,Crete,35.40695,24.84919,locality,Q21747337,,
+Kamilari,Kamilari,Crete,35.03389,24.78944,locality,Q992221,Kamilari,the tholos tomb is outside the village
+Kannia,"Kannia, Gortyn",Crete,,,,,,Wikidata item Q6364064 has no coordinates
+Kardamoutsa,Kardamoutsa,Crete,,,,,,only a monastery of the name is on Wikidata; the link is unconfirmed
+Kea,"Ayia Irini, Kea",Cyclades,37.66889,24.32583,site,Q393550,,
+Khania,Chania,Crete,35.51667,24.01667,locality,Q182299,Chania,Minoan Kydonia lies under the Kastelli hill in the old town
+Knossos,Knossos,Crete,35.29796,25.16316,site,Q173527,Knossos,
+Kophinas,Mount Kophinas,Crete,,,,,,"Wikidata has the municipal unit, not the mountain sanctuary"
+Kythera,"Kastri, Kythera",Kythera,,,,,,no Wikidata item found for the Minoan site at Kastri
+Larani,Larani,Crete,35.10528,25.06639,locality,Q12880102,,
+Mallia,Malia,Crete,35.28361,25.46250,locality,Q284463,"Malia, Crete",the palace is about 3 km east of the modern town
+Margiana,Margiana,Central Asia,37.66333,62.17639,region,Q154974,Margiana,the attribution of this find to Linear A is disputed
+Melos,"Phylakopi, Melos",Cyclades,36.75498,24.50458,site,Q1447360,Phylakopi,
+Miletos,Miletus,Anatolia,37.53111,27.27556,site,Q169460,Miletus,
+Mochlos,Mochlos,Crete,35.18444,25.90444,locality,Q992326,,the excavated site is the islet offshore from the village
+Mycenae,Mycenae,Peloponnese,37.73083,22.75611,site,Q132564,Mycenae,
+Nerokourou,Nerokourou,Crete,35.47583,24.03833,locality,Q12249495,Nerokouros,
+Palaikastro,Palaikastro,Crete,35.19778,26.25472,locality,Q941860,Palaikastro,the Minoan town at Roussolakkos is about 2 km east of the village
+Papoura,Papoura,Crete,,,,,,several Cretan places carry the name; none confirmed
+Petras,"Petras, Siteia",Crete,,,,,,no Wikidata item found with coordinates
+Phaistos,Phaistos,Crete,35.05123,24.81427,site,Q249707,Phaistos,
+Phourni,"Phourni, Archanes",Crete,35.24611,25.15861,site,Q1440052,Phourni,
+Platanos,"Platanos, Mesara",Crete,,,,,,no Wikidata item found for the Mesara tholos site
+Poros Herakleiou,"Poros-Katsambas, Heraklion",Crete,35.34116,25.15283,site,Q104830751,,
+Prassa,Prassa,Crete,35.30690,25.19180,site,Q7238563,Prassa,
+Psykhro,Psychro Cave,Crete,35.16286,25.44506,site,Q1643807,Psychro Cave,
+Pyrgos,Myrtos Pyrgos,Crete,35.00694,25.59056,site,Q2010377,Myrtos Pyrgos,
+Samothrace,Samothrace,North Aegean,40.45000,25.58750,region,Q203175,Samothrace,the find is from Mikro Vouni; this is the island
+Selakanos,Selakano,Crete,35.09230,25.54263,locality,Q7447449,Selakano,
+Sitia,Sitia,Crete,35.20769,26.10690,locality,Q985549,Sitia,
+Skhinia,Skhinia,Crete,,,,,,no Wikidata item found
+Skoteino Cave,Skoteino Cave,Crete,35.30484,25.29767,site,Q7536414,Skotino Cave,
+Syme,Kato Syme,Crete,35.04700,25.48900,locality,Q6377757,Kato Symi,the sanctuary lies above the village
+Tel Haror,Tel Haror,Negev,31.38210,34.60650,site,Q770842,Tel Haror,
+Thera,"Akrotiri, Thera",Cyclades,36.35136,25.40356,site,Q421232,Akrotiri (prehistoric city),
+Tiryns,Tiryns,Peloponnese,37.59944,22.79972,site,Q217379,Tiryns,
+Traostalos,Traostalos,Crete,35.12639,26.26722,site,Q4462172,Traostalos,
+Troullos,Troullos,Crete,,,,,,several places carry the name; none confirmed
+Troy,Troy (Hisarlik),Anatolia,,,,,,no Wikidata item found with coordinates
+Trypiti,Trypiti,Crete,,,,,,the Cretan Trypiti is not on Wikidata; other places of the name are
+Tylissos,Tylissos,Crete,35.29856,25.02044,site,Q38280988,Tylissus,
+Vrysinas,Mount Vrysinas,Crete,35.31180,24.49660,locality,Q7943207,Vrysinas,peak sanctuary at the summit
+Zakros,Kato Zakros,Crete,35.09806,26.26139,site,Q60218,Zakros,
+Zominthos,Zominthos,Crete,35.24869,24.88714,site,Q219818,Zominthos,

@@ -58,6 +58,7 @@ CREATE TABLE sites (
     lat REAL, lon REAL,           -- null where no position is recorded
     precision TEXT,               -- site | locality | region
     wikidata TEXT,                -- the Q-id the position was taken from
+    wikipedia TEXT,               -- English Wikipedia article title, where there is one
     note TEXT
 );
 
@@ -225,12 +226,13 @@ def load_sites(conn, path=SITES_CSV, warn=print):
             if lat and precision not in PRECISION:
                 raise SystemExit("%s: %r has precision %r, expected one of %s"
                                  % (path, name, precision, ", ".join(PRECISION)))
-            conn.execute("INSERT INTO sites VALUES (?,?,?,?,?,?,?,?)", (
+            conn.execute("INSERT INTO sites VALUES (?,?,?,?,?,?,?,?,?)", (
                 name, (row.get("label") or "").strip() or name,
                 (row.get("region") or "").strip() or None,
                 float(lat) if lat else None, float(lon) if lon else None,
                 precision if lat else None,
                 (row.get("wikidata") or "").strip() or None,
+                (row.get("wikipedia") or "").strip() or None,
                 (row.get("note") or "").strip() or None))
             n += 1
     missing = sorted(used - seen)

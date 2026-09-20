@@ -76,7 +76,8 @@ The corpus names the site an object was found at but records no position, so
 it came from and tagged with what the point actually marks — the excavated
 `site`, the `locality` around it, or only a `region`. Sites with no trusted
 coordinates are still listed; their map link searches by name. Correcting a
-row and rebuilding is enough to fix a pin. See the design doc, "Findspots".
+row and rebuilding is enough to fix a pin. Where the cited item has an
+English Wikipedia article the site name carries a `wiki` link too. See the design doc, "Findspots".
 
 ## Images and rights
 

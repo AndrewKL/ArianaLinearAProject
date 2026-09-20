@@ -518,6 +518,21 @@ button.linkish {
   text-decoration-color: currentColor;
 }
 
+/* The Wikipedia link rides alongside the map link, quieter: it is background,
+   not the findspot itself. */
+.findspot-wiki {
+  margin-left: 0.4em;
+  font-size: 0.8em;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 2px;
+}
+.findspot-wiki:hover,
+.findspot-wiki:focus-visible {
+  text-decoration-color: currentColor;
+}
+
 /* Text for screen readers only: the map link's precision caveat, which sighted
    readers get from the title attribute. */
 .visually-hidden {

@@ -286,11 +286,23 @@ function Findspot({ place, fallback }: { place: Place | null; fallback: string |
     ? PRECISION_NOTE[place.precision]
     : "no coordinates recorded; this searches by name";
   return (
-    <a className="findspot" href={place.mapUrl} rel="noopener" title={`Google Maps — ${note}`}>
-      {place.label}
-      <span aria-hidden="true"> ⌖</span>
-      <span className="visually-hidden"> — on Google Maps, {note}</span>
-    </a>
+    <>
+      <a className="findspot" href={place.mapUrl} rel="noopener" title={`Google Maps — ${note}`}>
+        {place.label}
+        <span aria-hidden="true"> ⌖</span>
+        <span className="visually-hidden"> — on Google Maps, {note}</span>
+      </a>
+      {place.wikipediaUrl && (
+        <a
+          className="findspot-wiki"
+          href={place.wikipediaUrl}
+          rel="nofollow noopener"
+          title={`${place.label} on Wikipedia`}
+        >
+          wiki<span className="visually-hidden">pedia article on {place.label}</span>
+        </a>
+      )}
+    </>
   );
 }
 

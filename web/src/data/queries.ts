@@ -296,7 +296,8 @@ export function mapUrl(place: {
 export function placeFor(db: Db, site: string | null): Place | null {
   if (!site) return null;
   const row = db.all<Record<string, any>>(
-    `SELECT name, label, region, lat, lon, precision, wikidata FROM sites WHERE name = ?`,
+    `SELECT name, label, region, lat, lon, precision, wikidata, wikipedia
+       FROM sites WHERE name = ?`,
     [site]
   )[0];
   if (!row) return null;
@@ -309,7 +310,18 @@ export function placeFor(db: Db, site: string | null): Place | null {
     precision: row.precision ?? null,
     wikidata: row.wikidata ?? null,
   };
-  return { ...place, mapUrl: mapUrl(place) };
+  return {
+    ...place,
+    mapUrl: mapUrl(place),
+    // The article title comes from the same Wikidata item as the position,
+    // so the two links can never point at different places.
+    // encodeURI, not encodeURIComponent: article titles cannot contain the
+    // characters encodeURI leaves alone, and commas and parentheses are part
+    // of the canonical URL ("Malia,_Crete", "Akrotiri_(prehistoric_city)").
+    wikipediaUrl: row.wikipedia
+      ? `https://en.wikipedia.org/wiki/${encodeURI(String(row.wikipedia).replace(/ /g, "_"))}`
+      : null,
+  };
 }
 
 export function getTextPage(db: Db, slug: string): TextPage | null {

@@ -57,6 +57,7 @@ export interface Place {
   precision: "site" | "locality" | "region" | null;
   wikidata: string | null;
   mapUrl: string;
+  wikipediaUrl: string | null;
 }
 
 export interface TextPage {
