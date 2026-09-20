@@ -60,6 +60,9 @@ footer {
   text-decoration: none;
   color: var(--ink);
 }
+.meta + .meta {
+  margin-top: -0.6rem;
+}
 .masthead-note,
 .meta,
 .layer-note,
@@ -521,10 +524,8 @@ button.linkish {
 /* The Wikipedia link rides alongside the map link, quieter: it is background,
    not the findspot itself. */
 .findspot-wiki {
-  margin-left: 0.4em;
-  font-size: 0.8em;
-  font-variant: small-caps;
-  letter-spacing: 0.04em;
+  font-size: 0.9em;
+  font-weight: 600;
   text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
   text-underline-offset: 2px;
 }
@@ -533,18 +534,6 @@ button.linkish {
   text-decoration-color: currentColor;
 }
 
-/* Text for screen readers only: the map link's precision caveat, which sighted
-   readers get from the title attribute. */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
 
 /* --- the about page: prose converted from docs/who-were-the-minoans.md --- */
 .masthead .masthead-link {

@@ -269,10 +269,14 @@ function Plates({ images, id }: { images: Image[]; id: string }) {
 }
 
 /**
- * The findspot, linked to a map. What the pin marks varies — a peak
- * sanctuary is a point, "Crete" is an island — so the precision is stated
- * rather than left for the reader to assume from the zoom level. With no
- * coordinates the link is a search by name, which claims nothing.
+ * The findspot, linked to a map and to Wikipedia. The link says "Map:" in
+ * words, so what it does survives being copied, read aloud, or seen by
+ * someone who cannot pick the accent colour out of the muted line.
+ *
+ * What the pin marks varies — a peak sanctuary is a point, "Crete" is an
+ * island — so the precision goes in `title` rather than being left for the
+ * reader to infer from the zoom level. With no coordinates the link is a
+ * search by name, which claims nothing.
  */
 const PRECISION_NOTE: Record<NonNullable<Place["precision"]>, string> = {
   site: "the excavated site",
@@ -287,20 +291,26 @@ function Findspot({ place, fallback }: { place: Place | null; fallback: string |
     : "no coordinates recorded; this searches by name";
   return (
     <>
-      <a className="findspot" href={place.mapUrl} rel="noopener" title={`Google Maps — ${note}`}>
-        {place.label}
-        <span aria-hidden="true"> ⌖</span>
-        <span className="visually-hidden"> — on Google Maps, {note}</span>
+      <a
+        className="findspot"
+        href={place.mapUrl}
+        rel="noopener"
+        title={`Google Maps — ${note}`}
+      >
+        Map: {place.label}
       </a>
       {place.wikipediaUrl && (
-        <a
-          className="findspot-wiki"
-          href={place.wikipediaUrl}
-          rel="nofollow noopener"
-          title={`${place.label} on Wikipedia`}
-        >
-          wiki<span className="visually-hidden">pedia article on {place.label}</span>
-        </a>
+        <>
+          {" · "}
+          <a
+            className="findspot-wiki"
+            href={place.wikipediaUrl}
+            rel="nofollow noopener"
+            title={`${place.label} on Wikipedia`}
+          >
+            <span aria-hidden="true">🔗 </span>Wikipedia
+          </a>
+        </>
       )}
     </>
   );
@@ -309,14 +319,19 @@ function Findspot({ place, fallback }: { place: Place | null; fallback: string |
 export function Text({ data }: { data: TextData }) {
   const t = data.text;
   const refs = [t.refs.gorila && `GORILA ${t.refs.gorila}`, t.refs.museum].filter(Boolean);
+  const object = [t.type?.replace("_", " "), t.period].filter(Boolean) as string[];
   return (
     <article>
       <h1>{t.id}</h1>
       <p className="meta">
         <Findspot place={t.place} fallback={t.site} />
-        {[t.type?.replace("_", " "), t.period].filter(Boolean).map((part) => ` · ${part}`)}
-        {refs.length > 0 && <span className="refs"> — {refs.join(" · ")}</span>}
       </p>
+      {(object.length > 0 || refs.length > 0) && (
+        <p className="meta">
+          {object.join(" · ")}
+          {refs.length > 0 && <span className="refs"> — {refs.join(" · ")}</span>}
+        </p>
+      )}
 
       <div className={t.images.length > 0 ? "with-plates" : undefined}>
         <Plates images={t.images} id={t.id} />
