@@ -269,7 +269,8 @@ cd web && npm install && npm run dev
 queries run in the browser against the same file through SQLite compiled to
 WebAssembly. See [`web/README.md`](web/README.md) to run it and
 [`docs/website-design.md`](docs/website-design.md) for the design and the
-reasoning behind the stack.
+reasoning behind the stack, and [`docs/data-sources.md`](docs/data-sources.md)
+for where each dataset came from and what could not be obtained.
 
 Inscription images (the GORILA facsimile drawings and photographs) are not
 part of the repository. `python3 -m lineara images fetch` downloads the ~1,000
