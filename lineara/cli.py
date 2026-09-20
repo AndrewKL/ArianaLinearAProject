@@ -42,6 +42,8 @@ def find_inscriptions(conn, ident):
 
 
 def source_label(row):
+    if row["source_label"]:
+        return row["source_label"]
     who = row["author"].split()[-1] if row["source_kind"] != "compilation" else "conventional"
     year = " %s" % row["year"] if row["year"] else ""
     status = ""
@@ -53,7 +55,7 @@ def source_label(row):
 def readings_for(conn, key):
     """Readings whose form (or a declared variant) is `key` exactly, or a sub-sequence of it."""
     rows = conn.execute(
-        """SELECT r.*, rf.key AS matched_key, s.author, s.year, s.kind AS source_kind, s.peer_reviewed
+        """SELECT r.*, rf.key AS matched_key, s.author, s.year, s.kind AS source_kind, s.peer_reviewed, s.label AS source_label
            FROM reading_forms rf JOIN readings r ON r.id = rf.reading_id
            JOIN sources s ON s.id = r.source_id
            WHERE instr(' ' || ? || ' ', ' ' || rf.key || ' ') > 0""", (key,)).fetchall()
@@ -322,7 +324,7 @@ def cmd_search(args):
 def cmd_readings(args):
     conn = connect(args.db)
     signs = SignTable.from_db(conn)
-    q = """SELECT r.*, r.key AS matched_key, s.author, s.year, s.kind AS source_kind, s.peer_reviewed
+    q = """SELECT r.*, r.key AS matched_key, s.author, s.year, s.kind AS source_kind, s.peer_reviewed, s.label AS source_label
            FROM readings r JOIN sources s ON s.id = r.source_id WHERE 1=1"""
     params = []
     if args.source:

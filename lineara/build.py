@@ -101,6 +101,8 @@ CREATE INDEX sign_occ_sign ON sign_occurrences(sign_id);
 CREATE TABLE sources (
     id TEXT PRIMARY KEY,
     author TEXT, year INTEGER, date TEXT, title TEXT, url TEXT,
+    label TEXT,                   -- short attribution shown beside a reading;
+                                  -- required when several compilations coexist
     kind TEXT,                    -- preprint, article, book, compilation ...
     peer_reviewed INTEGER,        -- 1, 0, or NULL when not applicable
     reported_by TEXT,
@@ -254,9 +256,10 @@ def load_readings(conn, signs, readings_dir=READINGS_DIR, warn=print):
             if not src.get(field):
                 raise ReadingsError("%s: source.%s is required" % (where, field))
         pr = src.get("peer_reviewed")
-        conn.execute("INSERT INTO sources VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        conn.execute("INSERT INTO sources VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                      (src["id"], src["author"], src.get("year"), src.get("date"), src["title"],
-                      src.get("url"), src["kind"], None if pr is None else int(bool(pr)),
+                      src.get("url"), src.get("label"), src["kind"],
+                      None if pr is None else int(bool(pr)),
                       src.get("reported_by"), src.get("notes"), path.name))
 
         for i, tr in enumerate(doc.get("translations") or []):

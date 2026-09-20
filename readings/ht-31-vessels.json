@@ -1,0 +1,72 @@
+{
+  "source": {
+    "id": "ht-31-vessels",
+    "author": "compiled for this repository",
+    "title": "Vessel terms read from the layout of HT 31",
+    "label": "HT 31 layout",
+    "kind": "compilation",
+    "notes": "HT 31 is a list of vessels: its entries pair a word with a vessel ideogram (A402, A410, A415, A416) and a quantity. That the words in it are vessel or container terms follows from the tablet's own layout and is not controversial. WHAT IS NOT CLAIMED HERE: which pot each word names. The ideogram A402 stands beside three different words on this tablet (lines 2, 9 and 10 of the Unicode text), so a word cannot simply be paired with the sign nearest it, and the tablet is damaged in several places. Proposals identifying particular vessel shapes exist in the literature -- see Y. Duhoux on HT 31 -- and are deliberately not reproduced here, because this file records only what the tablet itself shows. The quantities are worth noting: 10 each of qa-pa3, su-pu and ka-ro-pa3, but 30 sa-ja-ma, 300 su-pa3-ra and 3000 pa-ta-qe, so these are unlikely to all be objects of one kind or size. Check any of this with: python3 -m lineara show 'HT 31'. EXCLUDED: pu-ko and the damaged word ending -ti-sa, which stand in the tablet's opening line rather than in the list body, and so are not shown to be vessel terms."
+  },
+  "readings": [
+    {
+      "form": "qa-pa3",
+      "gloss": "a vessel or container type",
+      "kind": "vessel",
+      "confidence": "widely-accepted",
+      "proposed_on": "HT 31",
+      "basis": "Entry in the vessel list of HT 31, beside a vessel ideogram and the quantity 10. Occurs nowhere else in the corpus.",
+      "notes": "Compared by some with the Linear B vessel term qa-pa. The comparison is not asserted here."
+    },
+    {
+      "form": "su-pu",
+      "gloss": "a vessel or container type",
+      "kind": "vessel",
+      "confidence": "widely-accepted",
+      "proposed_on": "HT 31",
+      "basis": "Entry in the vessel list of HT 31, with the quantity 10. Its only occurrence as a word; the sequence also falls inside the longer words a-su-pu-wa (ARKH 2) and qe-su-pu (HT 87), which are separate words and not evidence for this reading."
+    },
+    {
+      "form": "ka-ro-pa3",
+      "gloss": "a vessel or container type",
+      "kind": "vessel",
+      "confidence": "widely-accepted",
+      "proposed_on": "HT 31",
+      "basis": "Entry in the vessel list of HT 31, beside a vessel ideogram and the quantity 10. Occurs nowhere else in the corpus."
+    },
+    {
+      "form": "sa-ja-ma",
+      "gloss": "a vessel or container type, or its contents",
+      "kind": "vessel",
+      "confidence": "debated",
+      "proposed_on": "HT 31",
+      "basis": "Entry in the vessel list of HT 31, with the quantity 30. Occurs nowhere else in the corpus.",
+      "notes": "No vessel ideogram survives immediately beside it, and the line is damaged, so it is weaker than the entries above."
+    },
+    {
+      "form": "su-pa3-ra",
+      "gloss": "a vessel or container type",
+      "kind": "vessel",
+      "confidence": "widely-accepted",
+      "proposed_on": "HT 31",
+      "basis": "Entry in the vessel list of HT 31, beside a vessel ideogram and the quantity 300. Occurs nowhere else in the corpus."
+    },
+    {
+      "form": "pa-ta-qe",
+      "gloss": "a vessel or container type",
+      "kind": "vessel",
+      "confidence": "widely-accepted",
+      "proposed_on": "HT 31",
+      "basis": "Entry in the vessel list of HT 31, beside a vessel ideogram and the quantity 3000, by far the largest on the tablet. Occurs nowhere else in the corpus.",
+      "notes": "The quantity argues for something small and countable rather than a large storage jar."
+    },
+    {
+      "form": "ki-de-ma-*323-na",
+      "gloss": "an entry in a list of vessels; a vessel term (?)",
+      "kind": "vessel",
+      "confidence": "debated",
+      "proposed_on": "HT 31",
+      "basis": "Stands in the body of the vessel list of HT 31, but on a line of its own, with the adjoining quantity and ideogram damaged. Occurs nowhere else in the corpus.",
+      "notes": "Contains *323, a sign with no agreed sound value, so even the transliteration is provisional."
+    }
+  ]
+}

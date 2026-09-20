@@ -3,6 +3,7 @@
     "id": "linear-b-names",
     "author": "compiled for this repository",
     "title": "Place and personal names read through Linear B correspondence",
+    "label": "Linear B correspondence",
     "kind": "compilation",
     "notes": "Not a single publication. Linear B is read, and a number of Linear A words are spelled the same way as names known from the Linear B tablets; where the Linear A attestations sit in a position that fits a name, the identification is conventional. Each reading's `basis` gives the internal evidence, which can be checked here: python3 -m lineara word <form>. These are claims about the name, not about the language of Linear A: a Minoan place could keep its name into the Mycenaean period whatever language its inhabitants spoke. NOT INCLUDED: di-de-ru, sometimes matched with the Linear B personal name di-de-ro. In this corpus it occurs beside ku-ni-su in what read as cereal lists (HT 86a, HT 95b), which does not support a personal name, so no reading is recorded for it. Before citing any of these, go to the literature."
   },

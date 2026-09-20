@@ -3,6 +3,7 @@
     "id": "conventional",
     "author": "compiled for this repository",
     "title": "Contextual interpretations common in the Linear A literature",
+    "label": "conventional",
     "kind": "compilation",
     "notes": "Not a single publication. These are the interpretations that most discussions of Linear A take as a starting point, each with the internal evidence for it in `basis`, which can be checked against this database (python3 -m lineara word <form>). Before citing any of them, go to the literature. J. G. Younger, Linear A Texts in phonetic transcription, was the standard free reference; its host people.ku.edu stopped resolving (checked 2026-09-20) and the texts and lexicon now circulate as PDFs on Academia.edu. For the libation formula see B. Davis (2014), Minoan Stone Vessels with Linear A Inscriptions (Aegaeum 36)."
   },

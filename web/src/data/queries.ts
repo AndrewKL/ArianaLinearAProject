@@ -107,7 +107,7 @@ function readingsFor(db: Db, key: string): Reading[] {
   const rows = db.all<Record<string, any>>(
     `SELECT r.id AS reading_id, r.gloss, r.confidence, r.source_id, r.proposed_on,
             r.basis, r.notes, rf.key AS matched_key, rf.form AS matched_form,
-            s.author, s.year, s.kind, s.peer_reviewed
+            s.author, s.year, s.kind, s.peer_reviewed, s.label AS source_label
        FROM reading_forms rf
        JOIN readings r ON r.id = rf.reading_id
        JOIN sources s ON s.id = r.source_id
@@ -121,10 +121,13 @@ function readingsFor(db: Db, key: string): Reading[] {
       gloss: r.gloss as string,
       confidence: r.confidence as Reading["confidence"],
       sourceId: r.source_id as string,
+      // A source may name its own short label. Several compilations coexist
+      // and "conventional" no longer tells them apart.
       sourceLabel:
-        r.kind === "compilation"
+        (r.source_label as string | null) ??
+        (r.kind === "compilation"
           ? "conventional"
-          : `${String(r.author).split(" ").pop()}${r.year ? " " + r.year : ""}`,
+          : `${String(r.author).split(" ").pop()}${r.year ? " " + r.year : ""}`),
       peerReviewed: r.peer_reviewed as number | null,
       scope: (r.matched_key === key ? "exact" : "part") as Reading["scope"],
       matchedForm: r.matched_form as string,
@@ -211,14 +214,16 @@ export function glyphsFor(db: Db, key: string): string {
 }
 
 const TRANSLATION_COLUMNS = `t.text, t.notes, t.source_id, s.author, s.year, s.title,
-       s.url, s.kind, s.peer_reviewed`;
+       s.url, s.kind, s.peer_reviewed, s.label AS source_label`;
 
 function toTranslation(r: Record<string, any>): Translation {
   return {
     text: r.text,
     notes: r.notes ?? null,
     sourceId: r.source_id,
-    sourceLabel: `${String(r.author).split(" ").pop()}${r.year ? " " + r.year : ""}`,
+    sourceLabel:
+      (r.source_label as string | null) ??
+      `${String(r.author).split(" ").pop()}${r.year ? " " + r.year : ""}`,
     sourceTitle: r.title,
     sourceUrl: r.url ?? null,
     sourceKind: r.kind,
